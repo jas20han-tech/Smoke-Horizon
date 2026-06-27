@@ -1,0 +1,717 @@
+/* Base resets & flat scientific typography - Color Graded Meteorological Radar Theme */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* Exact Hex Palette from Color Grade Guidelines */
+  --bg-dark: #0B0F14;
+  --bg-panel: #121821;
+  --border-flat: #1D2630;
+  
+  --primary: #4A8FE0;          /* Atmospheric Blue (Wind / Transport Vectors) */
+  --fire-amber: #E8A33D;       /* Warm Ember Amber (Fires / Stubble Risk) */
+  --safe-green: #1D9E75;       /* Muted Teal (Low Risk / Safe State) */
+  --risk-low: #1D9E75;
+  --risk-med: #E8A33D;
+  --risk-high: #E8A33D;        /* Warm Ember Amber for high risk */
+  
+  --text-primary: #E8E6E1;      /* Warm Off-White (Primary text) */
+  --text-secondary: #8A8D92;    /* Muted Slate-Gray (Captions / Labels) */
+  --text-muted: #575c65;
+}
+
+body {
+  background-color: var(--bg-dark);
+  /* Faint fractal noise (2% opacity) on the base background - no radial gradient on body background */
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.02'/%3E%3C/svg%3E");
+  color: var(--text-primary);
+  font-family: 'Inter', -apple-system, sans-serif;
+  overflow: hidden;
+  height: 100vh;
+}
+
+h1, h2, h3, .logo-section h1 {
+  font-family: 'Space Grotesk', -apple-system, sans-serif;
+  letter-spacing: -0.02em;
+}
+
+/* Monospace font for telemetry readouts */
+.mono, 
+.stat-value, 
+.time-badge, 
+.weather-row span:last-child,
+.timeline-scrubber,
+.aqi-score,
+.fire-coords,
+.confidence-rating,
+.telemetry-value {
+  font-family: 'JetBrains Mono', 'IBM Plex Mono', monospace !important;
+  font-weight: 500;
+}
+
+/* App orchestrator */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  padding: 1.25rem;
+  gap: 1rem;
+}
+
+/* Header bar - flat, no shadows */
+.top-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 1.25rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-flat);
+  border-radius: 4px;
+}
+
+.logo-section h1 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.logo-section span {
+  font-size: 0.72rem;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-secondary);
+  border-left: 1px solid var(--border-flat);
+  padding-left: 0.5rem;
+  font-weight: 400;
+}
+
+.system-status {
+  display: flex;
+  align-items: center;
+  gap: 1.25rem;
+  font-size: 0.8rem;
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--text-secondary);
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--safe-green);
+}
+
+/* Grid splits - Dashboard */
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr 370px;
+  flex: 1;
+  gap: 1rem;
+  min-height: 0;
+}
+
+/* Sidebar column */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+/* Custom Scrollbar */
+.sidebar::-webkit-scrollbar {
+  width: 4px;
+}
+.sidebar::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar::-webkit-scrollbar-thumb {
+  background: var(--border-flat);
+  border-radius: 4px;
+}
+
+/* Flat Panel Cards - no drop shadows */
+.glass-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-flat);
+  border-radius: 4px;
+  padding: 1rem 1.15rem;
+}
+
+.glass-card h2 {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.stat-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.65rem;
+}
+
+.stat-box {
+  background: rgba(255, 255, 255, 0.005);
+  border: 1px solid var(--border-flat);
+  border-radius: 4px;
+  padding: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.stat-label {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+}
+
+/* Flat action buttons - no heavy gradients/shadows */
+.action-btn {
+  width: 100%;
+  padding: 0.55rem 1rem;
+  background: rgba(74, 143, 224, 0.08);
+  border: 1px solid var(--primary);
+  color: var(--primary);
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.15s, color 0.15s;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+}
+
+.action-btn:hover {
+  background: var(--primary);
+  color: var(--bg-dark);
+}
+
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.action-btn.secondary {
+  border-color: var(--border-flat);
+  color: var(--text-secondary);
+  background: transparent;
+}
+
+.action-btn.secondary:hover {
+  border-color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--text-primary);
+}
+
+.action-btn.danger {
+  border-color: var(--fire-amber);
+  color: var(--fire-amber);
+  background: transparent;
+}
+
+.action-btn.danger:hover {
+  background: var(--fire-amber);
+  color: var(--bg-dark);
+}
+
+.sandbox-instructions {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  line-height: 1.35;
+  margin-top: 0.65rem;
+  padding: 0.45rem;
+  background: rgba(255, 255, 255, 0.005);
+  border-radius: 3px;
+  border-left: 2px solid var(--primary);
+}
+
+/* Map area container */
+.map-container-wrapper {
+  display: flex;
+  flex-direction: column;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-flat);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.map-view {
+  width: 100%;
+  flex: 1;
+  background: #06090e !important;
+}
+
+/* Scrubbable bottom timeline wrapper */
+.timeline-panel {
+  padding: 1rem 1.25rem;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--border-flat);
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.timeline-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.timeline-info {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.time-badge {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.timeline-scrubber {
+  width: 100%;
+  height: 3px;
+  -webkit-appearance: none;
+  background: #1D2630;
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+
+.timeline-scrubber::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--primary);
+  border: 1px solid #000;
+  cursor: pointer;
+}
+
+/* Cloud Mask caveat banner */
+.banner {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  margin-bottom: 0.2rem;
+  border: 1px solid transparent;
+}
+
+.banner.warning {
+  background: rgba(232, 163, 61, 0.04);
+  border-color: rgba(232, 163, 61, 0.15);
+  color: var(--fire-amber);
+}
+
+.banner.info {
+  background: rgba(74, 143, 224, 0.02);
+  border-color: rgba(74, 143, 224, 0.1);
+  color: var(--primary);
+}
+
+/* Weather parameters list */
+.weather-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+.weather-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.76rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.015);
+  padding-bottom: 0.35rem;
+}
+
+.weather-row:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+/* PAGE 1: LANDING SCREEN STYLING */
+.landing-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: 1.5rem;
+  overflow-y: auto;
+  padding-bottom: 2rem;
+}
+
+.telemetry-strip {
+  display: flex;
+  justify-content: space-around;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-flat);
+  border-radius: 4px;
+  padding: 0.75rem;
+  font-size: 0.82rem;
+}
+
+.telemetry-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.telemetry-label {
+  color: var(--text-secondary);
+}
+
+.telemetry-value {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+/* Hero Split Layout */
+.hero-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  min-height: 450px;
+}
+
+.hero-text-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 2.5rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-flat);
+  border-radius: 6px;
+}
+
+.hero-text-card h2 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+}
+
+.hero-text-card p {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 1.75rem;
+}
+
+/* Causal Chain flow diagrams - Detect -> Model -> Warn */
+.flow-explainer {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.flow-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-flat);
+  border-radius: 4px;
+  padding: 1.25rem;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.flow-card-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(74, 143, 224, 0.08);
+  border: 1.5px solid var(--primary);
+  border-radius: 4px;
+  color: var(--primary);
+  margin-bottom: 0.5rem;
+}
+
+.flow-card h3 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #fff;
+}
+
+.flow-card p {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+}
+
+/* Technical comparison sections - reactive vs predictive */
+.comparison-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  background: rgba(255, 255, 255, 0.005);
+  border: 1px solid var(--border-flat);
+  border-radius: 4px;
+  padding: 1.5rem;
+}
+
+.comparison-box h3 {
+  font-size: 0.95rem;
+  color: var(--text-primary);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.comparison-box p {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+/* Custom data-driven glows */
+.fire-glow {
+  filter: drop-shadow(0 0 4px var(--fire-amber));
+}
+
+.particle-glow {
+  filter: drop-shadow(0 0 3px rgba(74, 143, 224, 0.4));
+}
+
+@keyframes pulse-amber {
+  0% {
+    stroke-opacity: 0.25;
+    fill-opacity: 0.1;
+  }
+  50% {
+    stroke-opacity: 0.85;
+    fill-opacity: 0.45;
+  }
+  100% {
+    stroke-opacity: 0.25;
+    fill-opacity: 0.1;
+  }
+}
+
+.pulse-halo {
+  animation: pulse-amber 2.5s infinite ease-in-out;
+  filter: drop-shadow(0 0 5px var(--fire-amber));
+}
+
+/* Atmospheric scattering radial glow over the map container (single allowed gradient) */
+.map-atmospheric-glow {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 50% 50%, rgba(232, 163, 61, 0.08) 0%, transparent 68%);
+  z-index: 1000;
+}
+
+/* Map Basemap desaturation and dimming */
+.leaflet-tile-container {
+  filter: grayscale(100%) brightness(35%) contrast(115%) !important;
+}
+
+.leaflet-container {
+  background: #0B0F14 !important;
+}
+
+/* Leaflet popups & controls styled as a technical instrument */
+.leaflet-popup-content-wrapper, .leaflet-popup-tip {
+  background: var(--bg-panel) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid var(--border-flat) !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+}
+
+.leaflet-popup-content {
+  font-family: 'Inter', sans-serif !important;
+  color: var(--text-primary) !important;
+}
+
+.leaflet-popup-content strong {
+  color: var(--text-primary) !important;
+}
+
+.leaflet-bar {
+  border: 1px solid var(--border-flat) !important;
+  box-shadow: none !important;
+  border-radius: 4px !important;
+}
+
+.leaflet-bar a {
+  background-color: var(--bg-panel) !important;
+  color: var(--text-primary) !important;
+  border-bottom: 1px solid var(--border-flat) !important;
+}
+
+.leaflet-bar a:hover {
+  background-color: var(--border-flat) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Tilted 3D Map Preview for the Landing Page */
+.tilted-map-container {
+  width: 100%;
+  height: 100%;
+  perspective: 1200px;
+  overflow: hidden;
+  background: var(--bg-dark);
+  position: relative;
+}
+
+.tilted-map-view {
+  width: 100%;
+  height: 112%;
+  transform: rotateX(22deg) rotateY(-2deg) rotateZ(-4deg) translateY(-5%) scale(1.03);
+  transform-style: preserve-3d;
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.tilted-map-view:hover {
+  transform: rotateX(17deg) rotateY(-1deg) rotateZ(-2deg) translateY(-3%) scale(1.05);
+}
+
+/* 3D Map Perspective Tilt */
+.map-3d-active .leaflet-map-pane {
+  transform: rotateX(46deg) rotateZ(-12deg) scale(1.08) translateY(-3%);
+  transform-style: preserve-3d;
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base wrapper for regular markers to preserve 3D depth and not get flattened */
+.map-3d-active .leaflet-marker-pane,
+.map-3d-active .leaflet-shadow-pane,
+.map-3d-active .leaflet-tile-pane,
+.map-3d-active .leaflet-overlay-pane {
+  transform-style: preserve-3d !important;
+}
+
+/* Upright CSS 3D Column for Hotspots */
+.fire-column-3d {
+  width: 8px;
+  height: 8px;
+  position: relative;
+  transform-style: preserve-3d;
+  transform: translate3d(-4px, -4px, 0);
+}
+
+.fire-column-face {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 8px;
+  background: linear-gradient(to top, rgba(232, 163, 61, 0.45) 0%, var(--fire-amber) 100%);
+  border: 1px solid rgba(232, 163, 61, 0.8);
+  box-shadow: 0 0 6px rgba(232, 163, 61, 0.15);
+  transform-origin: bottom center;
+}
+
+.fire-column-front {
+  transform: rotateX(-90deg) translateZ(4px);
+}
+
+.fire-column-back {
+  transform: rotateX(-90deg) translateZ(-4px) rotateY(180deg);
+}
+
+.fire-column-left {
+  transform: rotateX(-90deg) rotateY(-90deg) translateZ(4px);
+}
+
+.fire-column-right {
+  transform: rotateX(-90deg) rotateY(90deg) translateZ(4px);
+}
+
+.fire-column-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 8px;
+  height: 8px;
+  background: var(--fire-amber);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transform: rotateX(0deg) translateZ(var(--height-val));
+}
+
+/* Map HUD Controls Overlay */
+.map-hud-controls {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 1000;
+  display: flex;
+  gap: 8px;
+}
+
+.hud-btn {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-flat);
+  color: var(--text-secondary);
+  padding: 6px 12px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: all 0.2s ease;
+}
+
+.hud-btn:hover {
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+.hud-btn.active {
+  border-color: var(--fire-amber);
+  color: var(--text-primary);
+  background: rgba(232, 163, 61, 0.06);
+}
+
+/* Marker Label for Delhi Receptor Location Context */
+.location-text-label {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  color: var(--text-primary) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 0.7rem !important;
+  font-weight: bold !important;
+  letter-spacing: 0.05em !important;
+  white-space: nowrap;
+  text-shadow: 0 0 3px #000, 0 0 5px #000;
+}
