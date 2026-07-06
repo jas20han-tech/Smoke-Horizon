@@ -4,7 +4,7 @@ import logging
 
 from app.db.session import engine, Base, SessionLocal
 from app.db.models import FireHotspot
-from app.api import routes_fires, routes_forecast, routes_backtest
+from app.api import routes_fires, routes_forecast, routes_backtest, routes_alerts, routes_exposure
 from app.data_sources.firms_client import fetch_active_fires
 
 # Configure logging
@@ -33,6 +33,8 @@ app.add_middleware(
 app.include_router(routes_fires.router)
 app.include_router(routes_forecast.router)
 app.include_router(routes_backtest.router)
+app.include_router(routes_alerts.router)
+app.include_router(routes_exposure.router)
 
 @app.on_event("startup")
 def seed_database():

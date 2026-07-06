@@ -30,7 +30,7 @@ export default function BacktestModal({ isOpen, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ padding: "1.75rem" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-          <h2 style={{ fontFamily: "Outfit", fontSize: "1.4rem", margin: 0, color: "var(--primary)" }}>
+          <h2 style={{ fontFamily: "Outfit", fontSize: "1.4rem", margin: 0, color: "var(--transition-blue)" }}>
             Model Validation & Backtest
           </h2>
           <button 
@@ -43,7 +43,7 @@ export default function BacktestModal({ isOpen, onClose }) {
         </div>
 
         {loading && <div style={{ color: "var(--text-secondary)", textAlign: "center", padding: "2rem" }}>Analyzing historical ground stations...</div>}
-        {error && <div style={{ color: "var(--risk-high)", textAlign: "center", padding: "2rem" }}>{error}</div>}
+        {error && <div style={{ color: "var(--severity-high)", textAlign: "center", padding: "2rem" }}>{error}</div>}
 
         {!loading && !error && data && (
           <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
@@ -55,23 +55,23 @@ export default function BacktestModal({ isOpen, onClose }) {
 
             {/* Metrics cards grid */}
             <div className="stat-group">
-              <div className="stat-box" style={{ background: "rgba(74, 143, 224, 0.04)" }}>
+              <div className="stat-box" style={{ background: "var(--transition-blue-soft)" }}>
                 <span className="stat-label">Pearson Correlation (R²)</span>
-                <span className="stat-value" style={{ color: "var(--primary)" }}>{metrics.r_squared}</span>
+                <span className="stat-value" style={{ color: "var(--transition-blue)" }}>{metrics.r_squared}</span>
               </div>
-              <div className="stat-box" style={{ background: "rgba(29, 158, 117, 0.04)" }}>
+              <div className="stat-box" style={{ background: "var(--severity-low-soft)" }}>
                 <span className="stat-label">Mean Absolute Error (MAE)</span>
-                <span className="stat-value" style={{ color: "var(--risk-low)" }}>{metrics.mean_absolute_error} µg/m³</span>
+                <span className="stat-value" style={{ color: "var(--severity-low)" }}>{metrics.mean_absolute_error} µg/m³</span>
               </div>
             </div>
 
             {/* Recharts Comparison Container */}
-            <div style={{ width: "100%", height: 300, background: "rgba(7, 10, 19, 0.5)", border: "1px solid var(--border-flat)", borderRadius: "12px", padding: "0.5rem" }}>
+            <div style={{ width: "100%", height: 300, background: "var(--bg-panel)", border: "1px solid var(--border-flat)", borderRadius: "12px", padding: "0.5rem" }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data} margin={{ top: 15, right: 15, left: 0, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.05)" />
-                  <XAxis dataKey="date" stroke="var(--text-muted)" fontSize={11} />
-                  <YAxis stroke="var(--text-muted)" fontSize={11} label={{ value: 'PM2.5 (µg/m³)', angle: -90, position: 'insideLeft', fill: 'var(--text-muted)', fontSize: 10, offset: 10 }} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="var(--border-flat)" />
+                  <XAxis dataKey="date" stroke="var(--text-secondary)" fontSize={11} />
+                  <YAxis stroke="var(--text-secondary)" fontSize={11} label={{ value: 'PM2.5 (µg/m³)', angle: -90, position: 'insideLeft', fill: 'var(--text-secondary)', fontSize: 10, offset: 10 }} />
                   <Tooltip 
                     contentStyle={{ 
                       backgroundColor: "var(--bg-panel)", 
@@ -86,7 +86,7 @@ export default function BacktestModal({ isOpen, onClose }) {
                     name="Delhi Baseline PM2.5" 
                     type="monotone" 
                     dataKey="baseline" 
-                    stroke="var(--text-muted)" 
+                    stroke="var(--text-secondary)" 
                     strokeWidth={1.5}
                     strokeDasharray="5 5" 
                     dot={false}
@@ -95,7 +95,7 @@ export default function BacktestModal({ isOpen, onClose }) {
                     name="Model Forecasted PM2.5" 
                     type="monotone" 
                     dataKey="predicted" 
-                    stroke="var(--fire-amber)" 
+                    stroke="var(--severity-high)" 
                     strokeWidth={2.5}
                     dot={{ r: 3 }}
                   />
@@ -103,7 +103,7 @@ export default function BacktestModal({ isOpen, onClose }) {
                     name="Actual CPCB PM2.5" 
                     type="monotone" 
                     dataKey="actual" 
-                    stroke="var(--primary)" 
+                    stroke="var(--transition-blue)" 
                     strokeWidth={2}
                     dot={{ r: 3 }}
                   />
@@ -111,7 +111,7 @@ export default function BacktestModal({ isOpen, onClose }) {
               </ResponsiveContainer>
             </div>
             
-            <div style={{ fontSize: "0.75rem", color: "var(--text-muted)", fontStyle: "italic", textAlign: "right" }}>
+            <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", fontStyle: "italic", textAlign: "right" }}>
               Model Status: {metrics.model_status}
             </div>
           </div>

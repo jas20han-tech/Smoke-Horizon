@@ -83,13 +83,13 @@ export default function RiskTimeline({ timeline, currentHour, onChangeHour }) {
                 fontSize: "1.3rem", 
                 fontWeight: "bold", 
                 color: getPm25Color(currentData.final_pm25),
-                borderBottom: isConfidenceDegraded ? "1px dashed var(--text-muted)" : "none",
+                borderBottom: isConfidenceDegraded ? "1px dashed var(--text-secondary)" : "none",
                 opacity: isConfidenceDegraded ? 0.75 : 1
               }}
               title={isConfidenceDegraded ? "Reduced satellite confidence window" : ""}
             >
               {currentData.final_pm25.toFixed(0)} <span style={{ fontSize: "10px", color: "var(--text-secondary)" }}>µg/m³</span>
-              {isConfidenceDegraded && <span style={{ fontSize: "10px", color: "var(--risk-med)", marginLeft: "4px" }}>*</span>}
+              {isConfidenceDegraded && <span style={{ fontSize: "10px", color: "var(--severity-mid)", marginLeft: "4px" }}>*</span>}
             </div>
           </div>
           <div style={{ textAlign: "right" }}>
@@ -112,10 +112,10 @@ export default function RiskTimeline({ timeline, currentHour, onChangeHour }) {
             <Area 
               type="monotone" 
               dataKey="final_pm25" 
-              stroke="var(--fire-amber)" 
+              stroke="var(--severity-high)" 
               strokeWidth={1.5}
               fillOpacity={1} 
-              fill="rgba(232, 163, 61, 0.08)" 
+              fill="var(--severity-high-soft)" 
               dot={false}
             />
           </AreaChart>
@@ -152,13 +152,14 @@ export default function RiskTimeline({ timeline, currentHour, onChangeHour }) {
 }
 
 function getPm25Color(val) {
-  if (val <= 60) return "var(--risk-low)";
-  if (val <= 120) return "var(--risk-med)";
-  return "var(--risk-high)";
+  if (val <= 60) return "var(--severity-low)";
+  if (val <= 120) return "var(--severity-mid)";
+  return "var(--severity-high)";
 }
 
 function getRiskColor(level) {
-  if (level === "Low") return "var(--risk-low)";
-  if (level === "Moderate") return "var(--risk-med)";
-  return "var(--risk-high)";
+  if (level === "Low") return "var(--severity-low)";
+  if (level === "Moderate" || level === "Medium") return "var(--severity-mid)";
+  if (level === "Severe") return "var(--severity-critical)";
+  return "var(--severity-high)";
 }

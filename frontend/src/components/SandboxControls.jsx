@@ -15,10 +15,10 @@ export default function SandboxControls({
         {customFireCount > 0 && (
           <span style={{ 
             fontSize: "0.75rem", 
-            background: "rgba(16, 185, 129, 0.15)", 
-            color: "var(--risk-low)", 
+            background: "var(--severity-low-soft)", 
+            color: "var(--severity-low)", 
             padding: "0.1rem 0.5rem", 
-            border: "1px solid var(--risk-low-glow)",
+            border: "1px solid var(--severity-low-soft)",
             borderRadius: "10px" 
           }}>
             {customFireCount} Custom Fire{customFireCount > 1 ? "s" : ""} Active
@@ -29,7 +29,7 @@ export default function SandboxControls({
       <div>
         <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.8rem", color: "var(--text-secondary)", marginBottom: "0.5rem" }}>
           <span>Spawn Fire Intensity (FRP)</span>
-          <span style={{ color: "var(--primary)", fontWeight: "bold" }}>{customFrp} MW</span>
+          <span style={{ color: "var(--transition-blue)", fontWeight: "bold" }}>{customFrp} MW</span>
         </div>
         <input 
           type="range" 

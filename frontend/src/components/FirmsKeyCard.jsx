@@ -36,8 +36,8 @@ export default function FirmsKeyCard({ onKeySuccess, currentStatus }) {
         <span>NASA Satellite Feed</span>
         <span style={{ 
           fontSize: "0.75rem", 
-          background: currentStatus === "Connected" ? "rgba(29, 158, 117, 0.12)" : "rgba(74, 143, 224, 0.12)",
-          color: currentStatus === "Connected" ? "var(--risk-low)" : "var(--primary)",
+          background: currentStatus === "Connected" ? "var(--severity-low-soft)" : "var(--transition-blue-soft)",
+          color: currentStatus === "Connected" ? "var(--severity-low)" : "var(--transition-blue)",
           padding: "0.1rem 0.5rem",
           borderRadius: "10px",
           border: "1px solid var(--border-flat)"
@@ -59,7 +59,7 @@ export default function FirmsKeyCard({ onKeySuccess, currentStatus }) {
             onChange={(e) => setKey(e.target.value)}
             style={{
               flex: 1,
-              background: "rgba(0, 0, 0, 0.2)",
+              background: "var(--bg-base)",
               border: "1px solid var(--border-flat)",
               borderRadius: "4px",
               padding: "0.5rem",
@@ -79,12 +79,12 @@ export default function FirmsKeyCard({ onKeySuccess, currentStatus }) {
         </div>
 
         {error && (
-          <div style={{ fontSize: "0.75rem", color: "var(--risk-high)", display: "flex", alignItems: "center", gap: "0.25rem" }}>
+          <div style={{ fontSize: "0.75rem", color: "var(--severity-high)", display: "flex", alignItems: "center", gap: "0.25rem" }}>
             ⚠️ {error}
           </div>
         )}
         {message && (
-          <div style={{ fontSize: "0.75rem", color: "var(--risk-low)", display: "flex", alignItems: "center", gap: "0.25rem" }}>
+          <div style={{ fontSize: "0.75rem", color: "var(--severity-low)", display: "flex", alignItems: "center", gap: "0.25rem" }}>
             ✓ {message}
           </div>
         )}
@@ -100,7 +100,7 @@ export default function FirmsKeyCard({ onKeySuccess, currentStatus }) {
           marginTop: "0.25rem" 
         }}>
           <span>Open-Meteo Weather API</span>
-          <span style={{ color: "var(--safe-green)", fontWeight: "600" }}>● Connected (Live 3-Station Sync)</span>
+          <span style={{ color: "var(--severity-low)", fontWeight: "600" }}>● Connected (Live 3-Station Sync)</span>
         </div>
       </form>
     </div>

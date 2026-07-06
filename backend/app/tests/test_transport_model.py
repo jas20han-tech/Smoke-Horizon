@@ -24,9 +24,9 @@ def test_boundary_layer():
     mult_low = get_boundary_layer_multiplier(350.0)
     assert mult_low == 2.0
     
-    # Boundary layer multiplier is clamped between 0.35 and 2.5
-    assert get_boundary_layer_multiplier(100.0) == 2.5
-    assert get_boundary_layer_multiplier(3000.0) == 0.35
+    # Boundary layer multiplier is clamped / transitions to nocturnal severe inversions (up to 3.0) and convective dilution (down to 0.30)
+    assert get_boundary_layer_multiplier(100.0) == 3.0
+    assert get_boundary_layer_multiplier(3000.0) == 0.30
 
 def test_humidity_decay():
     # CPCB baseline relative humidity (50%), no rain -> standard decay

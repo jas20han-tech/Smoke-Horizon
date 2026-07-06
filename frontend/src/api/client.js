@@ -54,3 +54,76 @@ export async function updateFirmsKey(key) {
   }
   return response.json();
 }
+
+// ── Exposure Score / Pinned Locations ────────────────────────
+
+export async function createPin(payload) {
+  const r = await fetch(`${API_BASE}/exposure/pins`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.detail || "Failed to create pin.");
+  return d;
+}
+
+export async function listPins() {
+  const r = await fetch(`${API_BASE}/exposure/pins`);
+  if (!r.ok) throw new Error("Failed to fetch pins.");
+  return r.json();
+}
+
+export async function deletePin(id) {
+  const r = await fetch(`${API_BASE}/exposure/pins/${id}`, { method: "DELETE" });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.detail || "Failed to delete pin.");
+  return d;
+}
+
+export async function scoreAllPins(timeline, fires, forecastWindowHours = 24) {
+  const r = await fetch(`${API_BASE}/exposure/score`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ timeline, fires, forecast_window_hours: forecastWindowHours }),
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.detail || "Failed to score pins.");
+  return d;
+}
+
+export async function createAlertSubscription(payload) {
+  const response = await fetch(`${API_BASE}/alerts/subscribe`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.detail || "Failed to create alert subscription.");
+  return data;
+}
+
+export async function deleteAlertSubscription(id) {
+  const response = await fetch(`${API_BASE}/alerts/subscribe/${id}`, { method: "DELETE" });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.detail || "Failed to delete subscription.");
+  return data;
+}
+
+export async function testAlertSend(id) {
+  const response = await fetch(`${API_BASE}/alerts/test-send/${id}`, { method: "POST" });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.detail || "Test send failed.");
+  return data;
+}
+
+export async function checkAndSendAlerts(timeline) {
+  const response = await fetch(`${API_BASE}/alerts/check-and-send`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ timeline }),
+  });
+  const data = await response.json();
+  if (!response.ok) throw new Error(data.detail || "Alert check failed.");
+  return data;
+}

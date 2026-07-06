@@ -7,9 +7,21 @@ import SandboxControls from "./components/SandboxControls";
 import FirmsKeyCard from "./components/FirmsKeyCard";
 import HotspotsPanel from "./components/HotspotsPanel";
 import DiagnosticsCard from "./components/DiagnosticsCard";
+import SourceAttribution from "./components/SourceAttribution";
 import AlertSettings from "./components/AlertSettings";
+import WhatsAppAlerts from "./components/WhatsAppAlerts";
+import ExposureScore from "./components/ExposureScore";
 import BacktestModal from "./components/BacktestModal";
-import { fetchForecast, addCustomFire, clearCustomFires } from "./api/client";
+import ClusterSidebar from "./components/ClusterSidebar";
+import ClusterDetailCard from "./components/ClusterDetailCard";
+import { fetchForecast, addCustomFire, clearCustomFires, checkAndSendAlerts } from "./api/client";
+
+function riskColor(level) {
+  if (level === "Severe") return "var(--severity-critical)";
+  if (level === "High") return "var(--severity-high)";
+  if (level === "Moderate" || level === "Medium") return "var(--severity-mid)";
+  return "var(--severity-low)";
+}
 
 export default function App() {
   const [forecast, setForecast] = useState(null);
@@ -21,16 +33,22 @@ export default function App() {
   const [error, setError] = useState("");
   
   // App view state: false = Landing/Hero, true = Active Dashboard
-  const [showDashboard, setShowDashboard] = useState(false);
+  const [showDashboard, setShowDashboard] = useState(true);
   
   // FlyTarget state to trigger map zooming
   const [flyTarget, setFlyTarget] = useState(null);
+
+  // Selected cluster for detail card
+  const [selectedCluster, setSelectedCluster] = useState(null);
 
   const loadForecastData = async () => {
     try {
       const data = await fetchForecast();
       setForecast(data);
       setError("");
+      // After each forecast refresh, silently check subscriptions against
+      // the new timeline. Runs in background — never blocks the UI.
+      checkAndSendAlerts(data.timeline).catch(() => {});
     } catch (err) {
       setError(err.message || "Failed to load real-time forecast simulation.");
     } finally {
@@ -75,6 +93,11 @@ export default function App() {
 
   const handleFlyToFire = (coords) => {
     setFlyTarget({ coords, zoom: 10 });
+  };
+
+  const handleSelectCluster = (fire) => {
+    setSelectedCluster(fire);
+    setFlyTarget({ coords: [fire.latitude, fire.longitude], zoom: 10 });
   };
 
   // Perform smooth real-time 60fps linear & circular interpolation
@@ -199,7 +222,7 @@ export default function App() {
 
   if (loading && !forecast) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "var(--bg-dark)", color: "var(--primary)" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "var(--bg-base)", color: "var(--transition-blue)" }}>
         <div style={{ textAlign: "center" }}>
           <h2 style={{ fontFamily: "Outfit", fontSize: "1.8rem", marginBottom: "1rem" }}>Smoke Horizon</h2>
           <p style={{ color: "var(--text-secondary)" }}>Initializing atmospheric physics solver...</p>
@@ -210,7 +233,7 @@ export default function App() {
 
   if (error && !forecast) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "var(--bg-dark)", color: "var(--risk-high)" }}>
+      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "var(--bg-base)", color: "var(--severity-high)" }}>
         <div style={{ textAlign: "center", maxWidth: "450px", padding: "2rem" }}>
           <h2 style={{ fontFamily: "Outfit", fontSize: "1.8rem", marginBottom: "1rem" }}>System Connection Failure</h2>
           <p style={{ color: "var(--text-secondary)", marginBottom: "1.5rem" }}>{error}</p>
@@ -234,8 +257,8 @@ export default function App() {
       {/* Top Header Bar */}
       <header className="top-bar">
         <div className="logo-section">
-          <h1 onClick={() => setShowDashboard(false)} style={{ cursor: "pointer" }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: "0.25rem" }}>
+          <h1 onClick={() => window.location.hash = "#/"} style={{ cursor: "pointer" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--transition-blue)" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: "0.25rem" }}>
               <path d="M12 2c1 2 2 3.5 2 5.5 0 2.5-1.5 4.5-4 4.5s-4-2-4-4.5c0-2 1-3.5 2-5.5z"></path>
               <path d="M17.5 12c1.5 1.5 2.5 3 2.5 5 0 3.5-3 6.5-6.5 6.5-3.5 0-6.5-3-6.5-6.5 0-2 1-3.5 2.5-5"></path>
             </svg>
@@ -250,7 +273,7 @@ export default function App() {
             style={{ 
               color: !showDashboard ? "var(--text-primary)" : "var(--text-secondary)", 
               cursor: "pointer", 
-              borderBottom: !showDashboard ? "1.5px solid var(--primary)" : "none", 
+              borderBottom: !showDashboard ? "1.5px solid var(--transition-blue)" : "none", 
               paddingBottom: "2px" 
             }}
             onClick={() => setShowDashboard(false)}
@@ -261,7 +284,7 @@ export default function App() {
             style={{ 
               color: showDashboard ? "var(--text-primary)" : "var(--text-secondary)", 
               cursor: "pointer", 
-              borderBottom: showDashboard ? "1.5px solid var(--primary)" : "none", 
+              borderBottom: showDashboard ? "1.5px solid var(--transition-blue)" : "none", 
               paddingBottom: "2px" 
             }}
             onClick={() => setShowDashboard(true)}
@@ -307,7 +330,7 @@ export default function App() {
           <div style={{ color: "var(--border-flat)", marginRight: "0.75rem" }}>|</div>
           
           <div className="status-indicator" style={{ marginRight: "0.75rem" }}>
-            <span className="status-dot" style={{ backgroundColor: "var(--safe-green)" }} />
+            <span className="status-dot" style={{ backgroundColor: "var(--severity-low)" }} />
             <span>Open-Meteo API: <strong style={{ color: "var(--text-primary)" }}>Connected</strong></span>
           </div>
 
@@ -315,7 +338,7 @@ export default function App() {
           
           <div className="status-indicator">
             <span className="status-dot" style={{ 
-              backgroundColor: currentData.risk_level === "High" ? "var(--risk-high)" : currentData.risk_level === "Moderate" ? "var(--risk-med)" : "var(--risk-low)"
+              backgroundColor: riskColor(currentData.risk_level)
             }} />
             <span>Risk Level: <strong>{currentData.risk_level}</strong></span>
           </div>
@@ -329,7 +352,7 @@ export default function App() {
           <div className="telemetry-strip mono">
             <div className="telemetry-item">
               <span className="telemetry-label">NASA Satellites Tracked:</span>
-              <span className="telemetry-value" style={{ color: "var(--fire-amber)" }}>{meta.fires_tracked} clusters</span>
+              <span className="telemetry-value" style={{ color: "var(--text-secondary)" }}>{meta.fires_tracked} clusters</span>
             </div>
             <div className="telemetry-item">
               <span className="telemetry-label">Regional Wind Bearing:</span>
@@ -337,7 +360,7 @@ export default function App() {
             </div>
             <div className="telemetry-item">
               <span className="telemetry-label">Delhi Arrival Window:</span>
-              <span className="telemetry-value" style={{ color: currentData.risk_level === "High" ? "var(--risk-high)" : "var(--primary)" }}>{expectedArrival}</span>
+              <span className="telemetry-value" style={{ color: currentData.risk_level === "Low" ? "var(--transition-blue)" : riskColor(currentData.risk_level) }}>{expectedArrival}</span>
             </div>
           </div>
 
@@ -351,6 +374,7 @@ export default function App() {
                 windSpeed={currentData.wind_speed}
                 windDirection={currentData.wind_direction}
                 onAddFire={handleAddCustomFire}
+                onClearFires={handleClearCustomFires}
                 flyTarget={flyTarget}
                 riskLevel={currentData.risk_level}
                 smokePm25={currentData.smoke_pm25}
@@ -426,7 +450,7 @@ export default function App() {
           <div className="comparison-section">
             <div className="comparison-box">
               <h3>
-                <span style={{ color: "var(--fire-coral)" }}>●</span>
+                <span style={{ color: "var(--text-secondary)" }}>●</span>
                 Reactive AQI Apps (Generic readings)
               </h3>
               <p>
@@ -437,7 +461,7 @@ export default function App() {
             </div>
             <div className="comparison-box">
               <h3>
-                <span style={{ color: "var(--safe-green)" }}>●</span>
+                <span style={{ color: "var(--severity-low)" }}>●</span>
                 Predictive early warning (Smoke Horizon)
               </h3>
               <p>
@@ -454,25 +478,50 @@ export default function App() {
       {showDashboard && (
         <div className="dashboard-grid">
           
-          {/* Left Column: Map and Timeline */}
-          <section className="map-container-wrapper">
-            <MapView 
-              fires={fires}
-              particles={currentData.particles}
-              windSpeed={currentData.wind_speed}
-              windDirection={currentData.wind_direction}
-              onAddFire={handleAddCustomFire}
-              flyTarget={flyTarget}
-              riskLevel={currentData.risk_level}
-              smokePm25={currentData.smoke_pm25}
-              isConfidenceDegraded={meta.confidence_score < 70}
-            />
+          {/* Left Column: Cluster Sidebar + Map + Timeline */}
+          <section className="map-container-wrapper" style={{ display: "flex", flexDirection: "column" }}>
+            {/* Map+Sidebar split */}
+            <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
+              {/* Cluster tracked list — left rail */}
+              <ClusterSidebar
+                fires={fires}
+                selectedClusterId={selectedCluster?.id}
+                onSelectCluster={handleSelectCluster}
+              />
 
-            <RiskTimeline 
-              timeline={forecast.timeline}
-              currentHour={currentHour}
-              onChangeHour={setCurrentHour}
-            />
+              {/* Map takes remaining width */}
+              <div style={{ flex: 1, position: "relative", minWidth: 0 }}>
+                <MapView 
+                  fires={fires}
+                  particles={currentData.particles}
+                  windSpeed={currentData.wind_speed}
+                  windDirection={currentData.wind_direction}
+                  onAddFire={handleAddCustomFire}
+                  onClearFires={handleClearCustomFires}
+                  flyTarget={flyTarget}
+                  riskLevel={currentData.risk_level}
+                  smokePm25={currentData.smoke_pm25}
+                  isConfidenceDegraded={meta.confidence_score < 70}
+                  onSelectCluster={handleSelectCluster}
+                  selectedClusterId={selectedCluster?.id}
+                />
+              </div>
+            </div>
+
+            {/* Bottom: Detail card (when cluster selected) or Timeline */}
+            {selectedCluster ? (
+              <ClusterDetailCard
+                fire={selectedCluster}
+                windSpeed={currentData.wind_speed}
+                onClose={() => setSelectedCluster(null)}
+              />
+            ) : (
+              <RiskTimeline 
+                timeline={forecast.timeline}
+                currentHour={currentHour}
+                onChangeHour={setCurrentHour}
+              />
+            )}
           </section>
 
           {/* Right Column: Sidebar Panels */}
@@ -487,7 +536,7 @@ export default function App() {
                   <span style={{ 
                     fontWeight: "bold",
                     fontSize: "1.1rem",
-                    color: currentData.risk_level === "High" ? "var(--risk-high)" : currentData.risk_level === "Moderate" ? "var(--risk-med)" : "var(--safe-green)"
+                    color: riskColor(currentData.risk_level)
                   }}>
                     {currentData.risk_level}
                   </span>
@@ -509,7 +558,7 @@ export default function App() {
                   fontFamily: "Outfit", 
                   fontSize: "2rem", 
                   fontWeight: "800",
-                  color: currentData.aqi > 200 ? "var(--risk-high)" : currentData.aqi > 100 ? "var(--risk-med)" : "var(--safe-green)"
+                  color: currentData.aqi > 200 ? "var(--severity-high)" : currentData.aqi > 100 ? "var(--severity-mid)" : "var(--severity-low)"
                 }}>
                   {currentData.aqi}
                 </span>
@@ -523,7 +572,7 @@ export default function App() {
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between" }}>
                   <span>Crop Residue Smoke Contribution</span>
-                  <span className="mono" style={{ fontWeight: "600", color: "var(--fire-amber)" }}>+{smokeAqiFraction} AQI</span>
+                  <span className="mono" style={{ fontWeight: "600", color: "var(--severity-high)" }}>+{smokeAqiFraction} AQI</span>
                 </div>
               </div>
             </div>
@@ -531,11 +580,20 @@ export default function App() {
             {/* Detailed Diagnostics */}
             <DiagnosticsCard currentData={currentData} />
 
+            {/* Source Attribution — PM2.5 split by source */}
+            <SourceAttribution currentData={currentData} fires={fires} />
+
             {/* Hotspots Panel with flight targeted zoom */}
             <HotspotsPanel fires={fires} onFlyTo={handleFlyToFire} />
 
             {/* Notification alert thresholds toggles */}
             <AlertSettings />
+
+            {/* WhatsApp advance-warning alerts via Twilio */}
+            <WhatsAppAlerts />
+
+            {/* Personalized Exposure Score — pinned locations */}
+            <ExposureScore forecast={forecast} />
 
             {/* API settings */}
             <FirmsKeyCard 

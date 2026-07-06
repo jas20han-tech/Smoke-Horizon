@@ -41,8 +41,8 @@ export default function DiagnosticsCard({ currentData }) {
             <span>Source Apportionment</span>
             <span>Smoke {smokePercent.toFixed(0)}% | City {baselinePercent.toFixed(0)}%</span>
           </div>
-          <div style={{ width: "100%", height: "8px", background: "rgba(255,255,255,0.05)", borderRadius: "4px", overflow: "hidden", display: "flex" }}>
-            <div style={{ width: `${smokePercent}%`, height: "100%", background: "var(--fire-amber)" }} />
+          <div style={{ width: "100%", height: "8px", background: "var(--panel-hover)", borderRadius: "4px", overflow: "hidden", display: "flex" }}>
+            <div style={{ width: `${smokePercent}%`, height: "100%", background: "var(--severity-high)" }} />
             <div style={{ width: `${baselinePercent}%`, height: "100%", background: "var(--text-secondary)" }} />
           </div>
         </div>
@@ -55,14 +55,14 @@ export default function DiagnosticsCard({ currentData }) {
         
         <div className="weather-row">
           <span>Stubble Smoke PM2.5</span>
-          <span style={{ color: "var(--fire-amber)", fontWeight: "600" }}>+{smoke_pm25.toFixed(1)} µg/m³</span>
+          <span style={{ color: "var(--severity-high)", fontWeight: "600" }}>+{smoke_pm25.toFixed(1)} µg/m³</span>
         </div>
 
         <div className="weather-row">
           <span>Boundary Layer Trapping</span>
           <span style={{ 
             fontWeight: "bold", 
-            color: clampedRatio > 1.2 ? "var(--risk-high)" : clampedRatio > 0.8 ? "var(--risk-med)" : "var(--risk-low)" 
+            color: clampedRatio > 1.2 ? "var(--severity-high)" : clampedRatio > 0.8 ? "var(--severity-mid)" : "var(--severity-low)" 
           }}>
             {clampedRatio.toFixed(2)}x ({Math.round(boundary_layer_height)}m)
           </span>
@@ -70,12 +70,12 @@ export default function DiagnosticsCard({ currentData }) {
 
         <div className="weather-row">
           <span>Dry Deposition Rate</span>
-          <span style={{ color: "var(--primary)" }}>{dryDepRate.toFixed(1)}% / hr</span>
+          <span style={{ color: "var(--transition-blue)" }}>{dryDepRate.toFixed(1)}% / hr</span>
         </div>
 
         <div className="weather-row">
           <span>Precipitation Washout</span>
-          <span style={{ color: precipitation > 0 ? "var(--risk-low)" : "var(--text-muted)" }}>
+          <span style={{ color: precipitation > 0 ? "var(--severity-low)" : "var(--text-secondary)" }}>
             {precipitation > 0 ? `${wetWashout.toFixed(0)}% (${precipitation} mm/h)` : "0% (No Rain)"}
           </span>
         </div>

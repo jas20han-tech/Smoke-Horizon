@@ -41,8 +41,8 @@ def create_custom_fire(latitude: float, longitude: float, frp: float = 100.0, db
     """
     Spawn a custom crop residue fire in the sandbox simulation.
     """
-    if not (26.0 <= latitude <= 34.0) or not (72.0 <= longitude <= 80.0):
-        raise HTTPException(status_code=400, detail="Coordinates out of Northern India regional bounds.")
+    if not (20.0 <= latitude <= 37.0) or not (68.0 <= longitude <= 97.0):
+        raise HTTPException(status_code=400, detail="Coordinates out of India regional bounds.")
         
     custom_fire = FireHotspot(
         latitude=latitude,

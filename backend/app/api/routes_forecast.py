@@ -25,8 +25,11 @@ def get_forecast(db: Session = Depends(get_db)):
     and Delhi composite PM2.5 risk index.
     """
     now = datetime.datetime.utcnow()
-    cutoff = now - datetime.timedelta(hours=24)
-    
+
+    # Fetch active fires — use 36h window to match forecast horizon
+    # and ensure fires seeded at startup are always included
+    cutoff = now - datetime.timedelta(hours=36)
+
     # 1. Fetch active fires from DB
     fires = db.query(FireHotspot).filter(FireHotspot.acq_time >= cutoff).all()
     

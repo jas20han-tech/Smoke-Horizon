@@ -8,6 +8,12 @@ class Settings(BaseSettings):
     NASA_FIRMS_API_KEY: str = ""
     OPENAQ_API_KEY: str = ""
 
+    # Twilio SMS credentials
+    TWILIO_ACCOUNT_SID: str = ""
+    TWILIO_AUTH_TOKEN: str = ""
+    # Your Twilio SMS phone number in E.164 format e.g. +15017122661
+    TWILIO_SMS_FROM: str = ""
+
     class Config:
         env_file = ".env"
         extra = "ignore"

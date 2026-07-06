@@ -6,9 +6,9 @@ export default function ConfidenceBanner({ meta }) {
   const { satellite_sync_status, cloud_cover_percent, is_gap_filled, confidence_score } = meta;
 
   const getConfidenceColor = (score) => {
-    if (score >= 80) return "var(--risk-low)";
-    if (score >= 50) return "var(--risk-med)";
-    return "var(--risk-high)";
+    if (score >= 80) return "var(--severity-low)";
+    if (score >= 50) return "var(--severity-mid)";
+    return "var(--severity-high)";
   };
 
   return (
@@ -36,7 +36,7 @@ export default function ConfidenceBanner({ meta }) {
             <span>Satellite Feed Status</span>
             <span style={{ 
               fontWeight: "bold", 
-              color: satellite_sync_status === "Connected" ? "var(--risk-low)" : "var(--primary)" 
+              color: satellite_sync_status === "Connected" ? "var(--severity-low)" : "var(--transition-blue)" 
             }}>
               {satellite_sync_status}
             </span>

@@ -13,8 +13,8 @@ export default function AlertCard({ riskLevel, pm25 }) {
             "Ensure air purifiers are running at home.",
             "Wear N95 respiratory masks if going outside is mandatory."
           ],
-          color: "var(--risk-high)",
-          bgColor: "rgba(232, 163, 61, 0.05)",
+          color: "var(--severity-high)",
+          bgColor: "var(--severity-high-soft)",
           borderColor: "var(--border-flat)"
         };
       case "Medium":
@@ -26,8 +26,8 @@ export default function AlertCard({ riskLevel, pm25 }) {
             "Keep doors and windows closed during peak morning/night hours.",
             "Consider indoor exercise rather than outdoor jogging."
           ],
-          color: "var(--risk-med)",
-          bgColor: "rgba(232, 163, 61, 0.03)",
+          color: "var(--severity-mid)",
+          bgColor: "var(--severity-mid-soft)",
           borderColor: "var(--border-flat)"
         };
       default:
@@ -38,8 +38,8 @@ export default function AlertCard({ riskLevel, pm25 }) {
             "Outdoor activities are safe to proceed.",
             "No special respirator precautions required."
           ],
-          color: "var(--risk-low)",
-          bgColor: "rgba(29, 158, 117, 0.03)",
+          color: "var(--severity-low)",
+          bgColor: "var(--severity-low-soft)",
           borderColor: "var(--border-flat)"
         };
     }
