@@ -71,15 +71,16 @@ def update_firms_key(key: str, db: Session = Depends(get_db)):
     Update the NASA FIRMS API key dynamically in memory.
     Clears all existing fire hotspots and triggers an immediate sync from real satellites.
     """
-    settings.NASA_FIRMS_API_KEY = key.strip()
+    import re
+    stripped_key = key.strip()
     
-    # Clear current DB fires so we can refresh
-    db.query(FireHotspot).delete()
-    db.commit()
-    
-    # Sync immediately (either fetches real active satellite fires using the new key,
-    # or falls back if the key is invalid or fails)
-    try:
+    # If the key is empty, we revert to simulated feed
+    if not stripped_key:
+        settings.NASA_FIRMS_API_KEY = ""
+        db.query(FireHotspot).delete()
+        db.commit()
+        
+        # Seed with simulated fires
         new_fires = fetch_active_fires()
         for f in new_fires:
             db_f = FireHotspot(
@@ -91,8 +92,38 @@ def update_firms_key(key: str, db: Session = Depends(get_db)):
             )
             db.add(db_f)
         db.commit()
+        
+        return {
+            "status": "Success",
+            "message": "NASA FIRMS API key cleared. Reverted to simulated active fires.",
+            "fires_synced": len(new_fires)
+        }
+        
+    # Format validation: must be 32 alphanumeric characters
+    if not re.match(r"^[a-zA-Z0-9]{32}$", stripped_key):
+        raise HTTPException(status_code=400, detail="NASA FIRMS API key must be exactly 32 alphanumeric characters.")
+        
+    try:
+        # Verify the key with real API before committing any state changes
+        new_fires = fetch_active_fires(api_key=stripped_key, raise_on_error=True)
+        
+        # If verification succeeded, save key and clear/refresh DB
+        settings.NASA_FIRMS_API_KEY = stripped_key
+        db.query(FireHotspot).delete()
+        db.commit()
+        
+        for f in new_fires:
+            db_f = FireHotspot(
+                latitude=f["latitude"],
+                longitude=f["longitude"],
+                frp=f["frp"],
+                acq_time=f["acq_time"],
+                is_custom=False
+            )
+            db.add(db_f)
+        db.commit()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error synchronizing fires after key update: {e}")
+        raise HTTPException(status_code=400, detail=f"Failed to verify API key: {e}")
         
     return {
         "status": "Success",

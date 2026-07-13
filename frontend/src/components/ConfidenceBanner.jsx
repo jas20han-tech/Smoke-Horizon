@@ -31,28 +31,18 @@ export default function ConfidenceBanner({ meta }) {
 
       <div className="glass-card">
         <h2>Satellite Sync Health</h2>
-        <div className="weather-details">
-          <div className="weather-row">
-            <span>Satellite Feed Status</span>
-            <span style={{ 
-              fontWeight: "bold", 
-              color: satellite_sync_status === "Connected" ? "var(--severity-low)" : "var(--transition-blue)" 
-            }}>
-              {satellite_sync_status}
-            </span>
+        <div style={{ display:"flex", flexDirection:"column" }}>
+          <div className="conf-row">
+            <span>Satellite Feed</span>
+            <span className="conf-val" style={{ color: satellite_sync_status === "Connected" ? "var(--green)" : "var(--blue)" }}>{satellite_sync_status}</span>
           </div>
-          <div className="weather-row">
-            <span>Regional Cloud Coverage</span>
-            <span style={{ fontWeight: "bold" }}>{cloud_cover_percent}%</span>
+          <div className="conf-row">
+            <span>Cloud Coverage</span>
+            <span className="conf-val">{cloud_cover_percent}%</span>
           </div>
-          <div className="weather-row">
-            <span>Forecast Confidence Rating</span>
-            <span style={{ 
-              fontWeight: "bold", 
-              color: getConfidenceColor(confidence_score)
-            }}>
-              {confidence_score}%
-            </span>
+          <div className="conf-row">
+            <span>Confidence</span>
+            <span className="conf-val" style={{ color: getConfidenceColor(confidence_score) }}>{confidence_score}%</span>
           </div>
         </div>
       </div>

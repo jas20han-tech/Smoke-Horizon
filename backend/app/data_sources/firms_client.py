@@ -41,13 +41,14 @@ REAL_HISTORICAL_HOTSPOTS = [
     {"lat": 30.7258, "lon": 75.0845, "frp": 208.1}  # Moga west
 ]
 
-def fetch_active_fires(db=None):
+def fetch_active_fires(db=None, api_key: str = None, raise_on_error: bool = False):
     """
     Fetch active fires from NASA FIRMS API.
     If no key is present or the request fails, load real historical
     satellite crop-burning coordinates offset to the current date.
     """
-    api_key = settings.NASA_FIRMS_API_KEY
+    if api_key is None:
+        api_key = settings.NASA_FIRMS_API_KEY
     
     if api_key:
         # Fetching VIIRS SNPP data (higher resolution than MODIS)
@@ -55,32 +56,60 @@ def fetch_active_fires(db=None):
         try:
             response = requests.get(url, timeout=8)
             if response.status_code == 200:
-                fires = []
-                csv_data = csv.DictReader(io.StringIO(response.text))
-                for row in csv_data:
-                    lat = float(row["latitude"])
-                    lon = float(row["longitude"])
-                    frp = float(row.get("frp", 10.0))
-                    acq_date = row.get("acq_date")
-                    acq_time = row.get("acq_time", "1200") # HHMM
-                    
-                    try:
-                        dt_str = f"{acq_date} {acq_time[:2]}:{acq_time[2:4]}"
-                        acq_dt = datetime.datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
-                    except Exception:
-                        acq_dt = datetime.datetime.utcnow()
-                        
-                    fires.append({
-                        "latitude": lat,
-                        "longitude": lon,
-                        "frp": frp,
-                        "acq_time": acq_dt,
-                        "is_custom": False
-                    })
-                if fires:
-                    logger.info(f"Successfully fetched {len(fires)} real active fires from NASA FIRMS API.")
-                    return fires
+                response_text = response.text
+                if "Invalid MAP_KEY" in response_text or "invalid key" in response_text.lower():
+                    if raise_on_error:
+                        raise ValueError("Invalid NASA FIRMS API key.")
+                    else:
+                        logger.error("NASA FIRMS API returned success status but error message: Invalid MAP_KEY. Falling back.")
+                else:
+                    fires = []
+                    if response_text.strip():
+                        csv_data = csv.DictReader(io.StringIO(response_text))
+                        if csv_data.fieldnames and "latitude" in csv_data.fieldnames:
+                            for row in csv_data:
+                                try:
+                                    lat = float(row["latitude"])
+                                    lon = float(row["longitude"])
+                                    frp = float(row.get("frp", 10.0))
+                                    acq_date = row.get("acq_date")
+                                    acq_time = row.get("acq_time", "1200") # HHMM
+                                    
+                                    try:
+                                        dt_str = f"{acq_date} {acq_time[:2]}:{acq_time[2:4]}"
+                                        acq_dt = datetime.datetime.strptime(dt_str, "%Y-%m-%d %H:%M")
+                                    except Exception:
+                                        acq_dt = datetime.datetime.utcnow()
+                                        
+                                    fires.append({
+                                        "latitude": lat,
+                                        "longitude": lon,
+                                        "frp": frp,
+                                        "acq_time": acq_dt,
+                                        "is_custom": False
+                                    })
+                                except (KeyError, ValueError) as parse_err:
+                                    if raise_on_error:
+                                        raise ValueError(f"Error parsing row from NASA FIRMS CSV: {parse_err}")
+                            
+                            logger.info(f"Successfully fetched {len(fires)} real active fires from NASA FIRMS API.")
+                            return fires
+                        else:
+                            if raise_on_error:
+                                raise ValueError("NASA FIRMS CSV response is missing required headers ('latitude').")
+                            else:
+                                logger.error("NASA FIRMS response format unexpected. Missing 'latitude' header. Falling back.")
+            else:
+                if raise_on_error:
+                    error_msg = response.text.strip() or f"HTTP {response.status_code}"
+                    raise ValueError(f"NASA FIRMS API request failed: {error_msg}")
+                else:
+                    logger.error(f"Failed to query real-time FIRMS API (HTTP {response.status_code}): {response.text.strip()}. Falling back.")
         except Exception as e:
+            if raise_on_error:
+                if isinstance(e, ValueError):
+                    raise e
+                raise ValueError(f"Failed to query NASA FIRMS API: {e}")
             logger.error(f"Failed to query real-time FIRMS API: {e}. Falling back to historical dataset.")
 
     # High-fidelity static simulation using real satellite coords

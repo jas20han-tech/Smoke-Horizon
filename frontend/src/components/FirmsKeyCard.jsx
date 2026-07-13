@@ -9,8 +9,30 @@ export default function FirmsKeyCard({ onKeySuccess, currentStatus }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!key.trim()) {
-      setError("Please enter a valid 32-character API key.");
+    const cleanKey = key.trim();
+    
+    // If the input is empty, we clear the key and revert to simulated mode
+    if (!cleanKey) {
+      setLoading(true);
+      setError("");
+      setMessage("");
+      try {
+        const res = await updateFirmsKey("");
+        setMessage("Reverted to simulated satellite feed.");
+        setKey(""); // Clear input
+        onKeySuccess(); // Trigger forecast reload in App
+      } catch (err) {
+        setError(err.message || "Failed to clear API key.");
+      } finally {
+        setLoading(false);
+      }
+      return;
+    }
+    
+    // Enforce exactly 32 alphanumeric characters format
+    const apiRegex = /^[a-zA-Z0-9]{32}$/;
+    if (!apiRegex.test(cleanKey)) {
+      setError("NASA FIRMS API key must be exactly 32 alphanumeric characters.");
       return;
     }
     
@@ -19,7 +41,7 @@ export default function FirmsKeyCard({ onKeySuccess, currentStatus }) {
     setMessage("");
     
     try {
-      const res = await updateFirmsKey(key);
+      const res = await updateFirmsKey(cleanKey);
       setMessage(`Sync Success: Tracking ${res.fires_synced} live fires.`);
       setKey(""); // Clear input
       onKeySuccess(); // Trigger forecast reload in App

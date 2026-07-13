@@ -14,6 +14,7 @@ import ExposureScore from "./components/ExposureScore";
 import BacktestModal from "./components/BacktestModal";
 import ClusterSidebar from "./components/ClusterSidebar";
 import ClusterDetailCard from "./components/ClusterDetailCard";
+import ForecastReportButton from "./components/ForecastReportButton";
 import { fetchForecast, addCustomFire, clearCustomFires, checkAndSendAlerts } from "./api/client";
 
 function riskColor(level) {
@@ -222,11 +223,16 @@ export default function App() {
 
   if (loading && !forecast) {
     return (
-      <div style={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100vh", backgroundColor: "var(--bg-base)", color: "var(--transition-blue)" }}>
-        <div style={{ textAlign: "center" }}>
-          <h2 style={{ fontFamily: "Outfit", fontSize: "1.8rem", marginBottom: "1rem" }}>Smoke Horizon</h2>
-          <p style={{ color: "var(--text-secondary)" }}>Initializing atmospheric physics solver...</p>
+      <div className="sh-loading">
+        <div className="sh-loading-logo">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--fire)" strokeWidth="2.5" strokeLinecap="round">
+            <path d="M12 2c1 2 2 3.5 2 5.5 0 2.5-1.5 4.5-4 4.5s-4-2-4-4.5c0-2 1-3.5 2-5.5z"/>
+            <path d="M17.5 12c1.5 1.5 2.5 3 2.5 5 0 3.5-3 6.5-6.5 6.5-3.5 0-6.5-3-6.5-6.5 0-2 1-3.5 2.5-5"/>
+          </svg>
+          Smoke Horizon
         </div>
+        <div className="sh-loading-bar"><div className="sh-loading-bar-fill"/></div>
+        <div className="sh-loading-sub">Initializing atmospheric physics solver…</div>
       </div>
     );
   }
@@ -528,64 +534,98 @@ export default function App() {
           <section className="sidebar">
             
             {/* CRB Smoke Risk Card */}
-            <div className="glass-card">
-              <h2>CRB Smoke Risk</h2>
-              <div className="weather-details" style={{ marginTop: "0.25rem" }}>
-                <div className="weather-row" style={{ borderBottom: "none", paddingBottom: 0 }}>
-                  <span>Risk Warning Tier</span>
-                  <span style={{ 
-                    fontWeight: "bold",
-                    fontSize: "1.1rem",
-                    color: riskColor(currentData.risk_level)
-                  }}>
-                    {currentData.risk_level}
-                  </span>
-                </div>
-                <div className="weather-row" style={{ borderBottom: "none", paddingBottom: 0, marginTop: "0.5rem" }}>
-                  <span>Estimated Arrival</span>
-                  <span style={{ fontWeight: "600", color: "var(--text-primary)", fontSize: "0.82rem" }}>
-                    {expectedArrival}
-                  </span>
+            <div className="glass-card risk-card">
+              <h2>
+                <span style={{ display:"flex", alignItems:"center", gap:6 }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--fire)" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2c1 2 2 3.5 2 5.5 0 2.5-1.5 4.5-4 4.5s-4-2-4-4.5c0-2 1-3.5 2-5.5z"/><path d="M17.5 12c1.5 1.5 2.5 3 2.5 5 0 3.5-3 6.5-6.5 6.5-3.5 0-6.5-3-6.5-6.5 0-2 1-3.5 2.5-5"/></svg>
+                  CRB Smoke Risk
+                </span>
+              </h2>
+              <div className="risk-card-hero">
+                <span className="risk-level-badge" style={{
+                  background: riskColor(currentData.risk_level) + "18",
+                  border: `1px solid ${riskColor(currentData.risk_level)}44`,
+                  color: riskColor(currentData.risk_level),
+                }}>
+                  <span style={{ width:7, height:7, borderRadius:"50%", background:riskColor(currentData.risk_level), display:"inline-block" }}/>
+                  {currentData.risk_level}
+                </span>
+                <div className="risk-arrival-row">
+                  <span style={{ fontSize:"0.6rem", color:"var(--text-3)", textTransform:"uppercase", letterSpacing:"0.08em", fontFamily:"JetBrains Mono,monospace" }}>Estimated Arrival</span>
+                  <span className="risk-arrival-val">{expectedArrival}</span>
                 </div>
               </div>
+              {currentData.risk_level !== "Low" && (
+                <div className="risk-action-tip">
+                  {currentData.risk_level === "High" ? "⚠ Avoid outdoor activity. Use N95 masks if going outside. Keep windows closed." : "Consider reducing prolonged outdoor exposure. Monitor conditions."}
+                </div>
+              )}
             </div>
 
             {/* Estimated Total AQI Card */}
-            <div className="glass-card">
-              <h2>Estimated Total AQI</h2>
-              <div style={{ display: "flex", alignItems: "baseline", gap: "0.5rem", margin: "0.4rem 0" }}>
-                <span style={{ 
-                  fontFamily: "Outfit", 
-                  fontSize: "2rem", 
-                  fontWeight: "800",
-                  color: currentData.aqi > 200 ? "var(--severity-high)" : currentData.aqi > 100 ? "var(--severity-mid)" : "var(--severity-low)"
-                }}>
-                  {currentData.aqi}
+            <div className="glass-card aqi-card">
+              <h2>
+                <span style={{ display:"flex", alignItems:"center", gap:6 }}>
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2.5" strokeLinecap="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+                  Estimated AQI
                 </span>
-                <span style={{ fontSize: "0.75rem", color: "var(--text-secondary)" }}>Composite AQI index</span>
-              </div>
-              
-              <div style={{ fontSize: "0.75rem", color: "var(--text-secondary)", lineHeight: "1.4", borderTop: "1px solid var(--border-flat)", paddingTop: "0.6rem" }}>
-                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "0.25rem" }}>
-                  <span>CPCB Urban Baseline</span>
-                  <span className="mono" style={{ fontWeight: "500", color: "var(--text-primary)" }}>{baseAqiFraction} AQI</span>
+              </h2>
+              <div className="aqi-hero">
+                {/* SVG arc gauge */}
+                <div className="aqi-ring-wrap">
+                  <svg viewBox="0 0 72 72" width="64" height="64">
+                    <circle cx="36" cy="36" r="28" fill="none" stroke="var(--border)" strokeWidth="7"/>
+                    <circle cx="36" cy="36" r="28" fill="none"
+                      stroke={currentData.aqi > 200 ? "var(--fire)" : currentData.aqi > 100 ? "var(--amber)" : "var(--green)"}
+                      strokeWidth="7" strokeLinecap="round"
+                      strokeDasharray={`${Math.min(100, currentData.aqi / 5) * 1.758} 175.8`}
+                      strokeDashoffset="43.95"
+                      style={{ transition:"stroke-dasharray 0.8s ease, stroke 0.4s" }}
+                    />
+                    <text x="36" y="40" textAnchor="middle" fontSize="13" fontWeight="800"
+                      fill={currentData.aqi > 200 ? "var(--fire)" : currentData.aqi > 100 ? "var(--amber)" : "var(--green)"}
+                      fontFamily="JetBrains Mono,monospace">{currentData.aqi}</text>
+                  </svg>
                 </div>
-                <div style={{ display: "flex", justifyContent: "space-between" }}>
-                  <span>Crop Residue Smoke Contribution</span>
-                  <span className="mono" style={{ fontWeight: "600", color: "var(--severity-high)" }}>+{smokeAqiFraction} AQI</span>
+                <div>
+                  <div className="aqi-number" style={{ color: currentData.aqi > 200 ? "var(--fire)" : currentData.aqi > 100 ? "var(--amber)" : "var(--green)" }}>
+                    {currentData.aqi}
+                  </div>
+                  <div className="aqi-label">Composite AQI</div>
+                </div>
+              </div>
+            <div className="aqi-breakdown">
+                <div className="aqi-breakdown-row">
+                  <span>CPCB Urban Baseline</span>
+                  <span className="aqi-breakdown-val mono" style={{ color:"var(--text-1)" }}>{baseAqiFraction}</span>
+                </div>
+                <div className="aqi-breakdown-row">
+                  <span>Crop Smoke Contribution</span>
+                  <span className="aqi-breakdown-val mono" style={{ color:"var(--fire)" }}>+{smokeAqiFraction}</span>
                 </div>
               </div>
             </div>
 
+            <ForecastReportButton
+              forecast={forecast}
+              currentData={currentData}
+              expectedArrival={expectedArrival}
+              meta={meta}
+              fires={fires}
+            />
+
+            <div className="sidebar-section-label">Atmospheric Analysis</div>
             {/* Detailed Diagnostics */}
             <DiagnosticsCard currentData={currentData} />
 
             {/* Source Attribution — PM2.5 split by source */}
             <SourceAttribution currentData={currentData} fires={fires} />
 
+            <div className="sidebar-section-label">Fire Tracking</div>
             {/* Hotspots Panel with flight targeted zoom */}
             <HotspotsPanel fires={fires} onFlyTo={handleFlyToFire} />
 
+            <div className="sidebar-section-label">Alerts &amp; Monitoring</div>
             {/* Notification alert thresholds toggles */}
             <AlertSettings />
 
@@ -595,6 +635,7 @@ export default function App() {
             {/* Personalized Exposure Score — pinned locations */}
             <ExposureScore forecast={forecast} />
 
+            <div className="sidebar-section-label">Configuration</div>
             {/* API settings */}
             <FirmsKeyCard 
               onKeySuccess={loadForecastData} 

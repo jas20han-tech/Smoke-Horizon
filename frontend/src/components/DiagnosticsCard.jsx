@@ -36,14 +36,14 @@ export default function DiagnosticsCard({ currentData }) {
       <div className="weather-details" style={{ display: "flex", flexDirection: "column", gap: "0.85rem" }}>
         
         {/* Source apportionment progress bar */}
-        <div>
-          <div style={{ display: "flex", justifyContent: "space-between", fontSize: "0.75rem", color: "var(--text-secondary)", marginBottom: "0.3rem" }}>
+        <div className="diag-bar-wrap">
+          <div className="diag-bar-label">
             <span>Source Apportionment</span>
-            <span>Smoke {smokePercent.toFixed(0)}% | City {baselinePercent.toFixed(0)}%</span>
+            <span>Smoke {smokePercent.toFixed(0)}% · City {baselinePercent.toFixed(0)}%</span>
           </div>
-          <div style={{ width: "100%", height: "8px", background: "var(--panel-hover)", borderRadius: "4px", overflow: "hidden", display: "flex" }}>
-            <div style={{ width: `${smokePercent}%`, height: "100%", background: "var(--severity-high)" }} />
-            <div style={{ width: `${baselinePercent}%`, height: "100%", background: "var(--text-secondary)" }} />
+          <div className="diag-bar-track">
+            <div className="diag-bar-smoke" style={{ width: `${smokePercent}%` }} />
+            <div className="diag-bar-city"  style={{ width: `${baselinePercent}%` }} />
           </div>
         </div>
 
