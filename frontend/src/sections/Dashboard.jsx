@@ -1,5 +1,5 @@
 /**
- * Dashboard — CTA section that bridges to the live telemetry board.
+ * Dashboard - CTA section that bridges to the live telemetry board.
  * Lazy-loaded via LazySection wrapper.
  */
 export default function Dashboard() {

@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { getStateNameSync, primeCache } from "../utils/geoLocate";
 
 // ── Palette ───────────────────────────────────────────────────
@@ -20,7 +20,7 @@ function frpSeverity(frp) {
 
 // Estimate risk to Delhi based on frp and proximity
 function estimateRisk(fire) {
-  const distToDelhiLat = Math.abs(fire.latitude  - 28.6139);
+  const distToDelhiLat = Math.abs(fire.latitude - 28.6139);
   const distToDelhiLon = Math.abs(fire.longitude - 77.209);
   const dist = Math.sqrt(distToDelhiLat ** 2 + distToDelhiLon ** 2);
   const score = (fire.frp / (dist + 1)) * 4;
@@ -31,7 +31,7 @@ function estimateRisk(fire) {
 
 // Format acquisition time
 function formatTime(acqTime) {
-  if (!acqTime) return "—";
+  if (!acqTime) return "--";
   try {
     const d = new Date(acqTime);
     return d.toLocaleTimeString("en-IN", { hour: "2-digit", minute: "2-digit", hour12: false }) +
@@ -83,7 +83,7 @@ function ClusterRow({ fire, isSelected, onClick }) {
 export default function ClusterSidebar({ fires, selectedClusterId, onSelectCluster }) {
   const [, forceUpdate] = useState(0);
 
-  // Prime geo cache async — triggers re-render once state names resolve
+  // Prime geo cache async - triggers re-render once state names resolve
   useEffect(() => {
     primeCache(fires).then(() => forceUpdate(n => n + 1));
   }, [fires]);

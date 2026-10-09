@@ -1,13 +1,13 @@
 import { useRef, useEffect, useState } from "react";
 
 /**
- * Closing — the last section on the page.
+ * Closing - the last section on the page.
  *
  * Short. Plain. No second pitch.
- *   - Why this exists (one paragraph, honest)
- *   - Contact / contribute links
- *   - Single CTA back to the forecast
- *   - Footer with data credits + last-updated timestamp
+ * - Why this exists (one paragraph, honest)
+ * - Contact / contribute links
+ * - Single CTA back to the forecast
+ * - Footer with data credits + last-updated timestamp
  *
  * Lazy-loaded via LazySection wrapper.
  * One soft fade-in on viewport entry, nothing more.
@@ -44,7 +44,7 @@ const LINKS = [
   },
 ];
 
-/* Stable build timestamp — updated at build time in a real deployment */
+/* Stable build timestamp - updated at build time in a real deployment */
 const LAST_UPDATED = new Date().toLocaleDateString("en-GB", {
   day: "numeric",
   month: "long",
@@ -89,8 +89,8 @@ export default function Closing() {
         <p className="cl-para">
           Every October and November, farmers across Punjab and Haryana burn
           the stubble left after the rice harvest to clear fields quickly before
-          the next wheat sowing. The smoke travels southeast. Delhi-NCR — home
-          to roughly 32 million people — has no dedicated advance-warning
+          the next wheat sowing. The smoke travels southeast. Delhi-NCR - home
+          to roughly 32 million people - has no dedicated advance-warning
           system for when these plumes will arrive or how severe the impact will
           be. Standard AQI apps report what is already happening; they don't
           forecast what is coming.
@@ -99,7 +99,7 @@ export default function Closing() {
         <p className="cl-para">
           Smoke Horizon is an attempt to close that gap using publicly available
           satellite and atmospheric data. It is not a replacement for
-          institutional air quality monitoring — it is a supplementary
+          institutional air quality monitoring; it is a supplementary
           early-warning layer that gives residents, hospitals, and schools a
           usable lead time before the air turns.
         </p>

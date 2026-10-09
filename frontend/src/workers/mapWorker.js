@@ -1,5 +1,5 @@
 /**
- * mapWorker.js — runs PIP + dot-grid build off the main thread.
+ * mapWorker.js - runs PIP + dot-grid build off the main thread.
  * Posts back an ImageBitmap of the fully-rendered static dot layer.
  */
 
@@ -98,7 +98,7 @@ self.onmessage = async ({ data: { w, h, geoJSON, riskLevel, dpr } }) => {
       }
       if(!matchName)continue;
 
-      // Border check — only test nearby segments (bbox cull)
+      // Border check - only test nearby segments (bbox cull)
       let nb=false;
       for(const[[x1,y1],[x2,y2]]of segs){
         const minX=Math.min(x1,x2)-BORDER,maxX=Math.max(x1,x2)+BORDER;

@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
-import { ResponsiveContainer, AreaChart, Area, Tooltip } from "recharts";
+import { useState, useEffect } from "react";
+import { ResponsiveContainer, AreaChart, Area } from "recharts";
 
-export default function RiskTimeline({ timeline, currentHour, onChangeHour }) {
+export default function RiskTimeline({ timeline, fires, currentHour, onChangeHour }) {
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
@@ -38,6 +38,28 @@ export default function RiskTimeline({ timeline, currentHour, onChangeHour }) {
   // Check if forecast has low confidence to render a softer / dashed style
   // (satellite data is degraded)
   const isConfidenceDegraded = currentData.smoke_pm25 > 0 && currentData.final_pm25 > 150 && baseHourIndex % 2 === 0;
+
+  // Fire ignitions bucketed per forecast hour - the "plume is arriving" story.
+  // Fires acquired before the window starts are counted as lit from hour 0.
+  const t0Ms = new Date(timeline[0].time).getTime();
+  const HOUR_MS = 3600000;
+  const fireCounts = new Array(timeline.length).fill(0);
+  let fireTotal = 0;
+  (fires || []).forEach((f) => {
+    const t = new Date(f.acq_time).getTime();
+    if (Number.isNaN(t)) {
+      fireCounts[0]++;
+      fireTotal++;
+      return;
+    }
+    let h = Math.floor((t - t0Ms) / HOUR_MS);
+    if (h < 0) h = 0;
+    else if (h >= timeline.length) h = timeline.length - 1;
+    fireCounts[h]++;
+    fireTotal++;
+  });
+  const fireMax = Math.max(1, ...fireCounts);
+  const firesLit = fireCounts.slice(0, baseHourIndex + 1).reduce((a, b) => a + b, 0);
 
   return (
     <div className="timeline-panel glass-card">
@@ -105,34 +127,72 @@ export default function RiskTimeline({ timeline, currentHour, onChangeHour }) {
         </div>
       </div>
 
-      {/* Mini Area Chart Sparkline representation of PM2.5 Forecast */}
-      <div style={{ width: "100%", height: 45, position: "relative", marginBottom: "0.25rem", overflow: "hidden" }}>
-        <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={timeline} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
-            <Area 
-              type="monotone" 
-              dataKey="final_pm25" 
-              stroke="var(--severity-high)" 
-              strokeWidth={1.5}
-              fillOpacity={1} 
-              fill="var(--severity-high-soft)" 
-              dot={false}
-            />
-          </AreaChart>
-        </ResponsiveContainer>
-        
-        {/* Scrubber indicator line */}
-        <div style={{
-          position: "absolute",
-          top: 0,
-          bottom: 0,
-          left: `${(currentHour / (timeline.length - 1)) * 100}%`,
-          width: "1.5px",
-          background: "var(--text-primary)",
-          pointerEvents: "none",
-          transition: "left 0.05s linear",
-          opacity: 0.8
-        }} />
+      {/* Mini Area Chart Sparkline + fire-ignition histogram */}
+      <div style={{ width: "100%", marginBottom: "0.25rem" }}>
+        <div style={{ position: "relative", height: 62 }}>
+          <div style={{ height: 45, overflow: "hidden" }}>
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={timeline} margin={{ top: 2, right: 0, left: 0, bottom: 2 }}>
+                <Area 
+                  type="monotone" 
+                  dataKey="final_pm25" 
+                  stroke="var(--severity-high)" 
+                  strokeWidth={1.5}
+                  fillOpacity={1} 
+                  fill="var(--severity-high-soft)" 
+                  dot={false}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+
+          {/* Fire ignitions per hour: bars climb as stubble fires light up */}
+          <div style={{ display: "flex", gap: 1, alignItems: "flex-end", height: 12, marginTop: 5 }}>
+            {fireCounts.map((c, i) => (
+              <div key={i} style={{ flex: 1, height: "100%", display: "flex", alignItems: "flex-end" }}>
+                <div style={{
+                  width: "100%",
+                  height: c === 0 ? 2 : `${Math.max(16, (c / fireMax) * 100)}%`,
+                  background: c === 0
+                    ? "rgba(27,34,45,0.7)"
+                    : `rgba(232,163,61,${0.35 + 0.65 * (c / fireMax)})`,
+                  borderRadius: 1,
+                  transition: "height 0.2s ease",
+                }} />
+              </div>
+            ))}
+          </div>
+
+          {/* Scrubber indicator line: spans sparkline + fire bars */}
+          <div style={{
+            position: "absolute",
+            top: 0,
+            bottom: 0,
+            left: `${(currentHour / (timeline.length - 1)) * 100}%`,
+            width: "1.5px",
+            background: "var(--text-primary)",
+            pointerEvents: "none",
+            transition: "left 0.05s linear",
+            opacity: 0.8
+          }} />
+        </div>
+
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 3 }}>
+          <span style={{
+            fontSize: "8px", letterSpacing: "0.08em", color: "var(--text-secondary)",
+            fontFamily: "JetBrains Mono, monospace", textTransform: "uppercase",
+            display: "flex", alignItems: "center", gap: 4,
+          }}>
+            <span style={{ color: "var(--severity-high)" }}>▲</span>
+            Fire ignitions by hour
+          </span>
+          <span style={{
+            fontSize: "9px", fontFamily: "JetBrains Mono, monospace",
+            color: "var(--severity-high)", fontWeight: 600,
+          }}>
+            {firesLit}/{fireTotal} lit
+          </span>
+        </div>
       </div>
 
       <input
@@ -147,6 +207,34 @@ export default function RiskTimeline({ timeline, currentHour, onChangeHour }) {
         }}
         className="timeline-scrubber"
       />
+
+      {/* Live step metrics */}
+      <div className="timeline-meta-grid">
+        <div className="timeline-meta-cell">
+          <span className="timeline-meta-label">Wind</span>
+          <span className="timeline-meta-val" style={{ color: "var(--transition-blue)" }}>
+            {currentData.wind_speed.toFixed(1)} km/h · {currentData.wind_direction.toFixed(0)}°
+          </span>
+        </div>
+        <div className="timeline-meta-cell">
+          <span className="timeline-meta-label">Stubble smoke</span>
+          <span className="timeline-meta-val" style={{ color: "var(--severity-high)" }}>
+            +{currentData.smoke_pm25.toFixed(1)} µg/m³
+          </span>
+        </div>
+        <div className="timeline-meta-cell">
+          <span className="timeline-meta-label">Composite AQI</span>
+          <span className="timeline-meta-val" style={{ color: getPm25Color(currentData.final_pm25) }}>
+            {currentData.aqi}
+          </span>
+        </div>
+        <div className="timeline-meta-cell">
+          <span className="timeline-meta-label">Risk score</span>
+          <span className="timeline-meta-val" style={{ color: getRiskColor(currentData.risk_level) }}>
+            {currentData.risk_score.toFixed(0)} · {currentData.risk_level}
+          </span>
+        </div>
+      </div>
     </div>
   );
 }

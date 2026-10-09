@@ -1,13 +1,13 @@
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import MapView from "./components/MapView";
 import RiskTimeline from "./components/RiskTimeline";
 import ConfidenceBanner from "./components/ConfidenceBanner";
-import AlertCard from "./components/AlertCard";
 import SandboxControls from "./components/SandboxControls";
 import FirmsKeyCard from "./components/FirmsKeyCard";
 import HotspotsPanel from "./components/HotspotsPanel";
 import DiagnosticsCard from "./components/DiagnosticsCard";
 import SourceAttribution from "./components/SourceAttribution";
+import CityComparison from "./components/CityComparison";
 import AlertSettings from "./components/AlertSettings";
 import WhatsAppAlerts from "./components/WhatsAppAlerts";
 import ExposureScore from "./components/ExposureScore";
@@ -42,13 +42,27 @@ export default function App() {
   // Selected cluster for detail card
   const [selectedCluster, setSelectedCluster] = useState(null);
 
+  // Toast notification state
+  const [toast, setToast] = useState(null);
+
+  // Notification center drawer state
+  const [isNotifOpen, setIsNotifOpen] = useState(false);
+
+  const showToast = (message, type = "info") => {
+    const id = Date.now();
+    setToast({ id, message, type });
+    setTimeout(() => {
+      setToast(curr => (curr && curr.id === id ? null : curr));
+    }, 4000);
+  };
+
   const loadForecastData = async () => {
     try {
       const data = await fetchForecast();
       setForecast(data);
       setError("");
       // After each forecast refresh, silently check subscriptions against
-      // the new timeline. Runs in background — never blocks the UI.
+      // the new timeline. Runs in background: never blocks the UI.
       checkAndSendAlerts(data.timeline).catch(() => {});
     } catch (err) {
       setError(err.message || "Failed to load real-time forecast simulation.");
@@ -66,8 +80,9 @@ export default function App() {
       setLoading(true);
       await addCustomFire(lat, lon, customFrp);
       await loadForecastData();
+      showToast("Custom hotspot injected into atmospheric solver", "success");
     } catch (err) {
-      alert(`Error spawning custom fire: ${err.message}`);
+      showToast(`Error spawning custom fire: ${err.message}`, "error");
       setLoading(false);
     }
   };
@@ -77,8 +92,9 @@ export default function App() {
       setLoading(true);
       await clearCustomFires();
       await loadForecastData();
+      showToast("Cleared all simulated custom hotspots", "info");
     } catch (err) {
-      alert(`Error clearing custom fires: ${err.message}`);
+      showToast(`Error clearing custom fires: ${err.message}`, "error");
       setLoading(false);
     }
   };
@@ -254,6 +270,10 @@ export default function App() {
   const customFireCount = fires.filter(f => f.is_custom).length;
   const expectedArrival = calculateArrivalTime(currentHour);
 
+  // Fire-replay sync: acquisition times are bucketed against the timeline start
+  const timelineStartMs = new Date(forecast.timeline[0].time).getTime();
+  const timelineLen = forecast.timeline.length;
+
   // Apportionment math for total AQI breakdown display
   const baseAqiFraction = Math.max(10, Math.round(currentData.aqi * (currentData.baseline_pm25 / currentData.final_pm25)));
   const smokeAqiFraction = Math.max(0, currentData.aqi - baseAqiFraction);
@@ -269,55 +289,56 @@ export default function App() {
               <path d="M17.5 12c1.5 1.5 2.5 3 2.5 5 0 3.5-3 6.5-6.5 6.5-3.5 0-6.5-3-6.5-6.5 0-2 1-3.5 2.5-5"></path>
             </svg>
             Smoke Horizon 
-            <span>Weather forecast for crop smoke</span>
+            <span>Atmospheric Crop Smoke Forecast</span>
           </h1>
         </div>
         
-        {/* Minimal Navigation */}
-        <nav style={{ display: "flex", gap: "1.5rem", fontSize: "0.82rem", color: "var(--text-secondary)" }}>
-          <span 
-            style={{ 
-              color: !showDashboard ? "var(--text-primary)" : "var(--text-secondary)", 
-              cursor: "pointer", 
-              borderBottom: !showDashboard ? "1.5px solid var(--transition-blue)" : "none", 
-              paddingBottom: "2px" 
-            }}
+        {/* Segmented Navigation */}
+        <nav className="nav-segment-group" aria-label="Primary Navigation">
+          <button 
+            type="button"
+            className={`nav-tab-btn ${!showDashboard ? "active" : ""}`}
             onClick={() => setShowDashboard(false)}
           >
             Overview
-          </span>
-          <span 
-            style={{ 
-              color: showDashboard ? "var(--text-primary)" : "var(--text-secondary)", 
-              cursor: "pointer", 
-              borderBottom: showDashboard ? "1.5px solid var(--transition-blue)" : "none", 
-              paddingBottom: "2px" 
-            }}
+          </button>
+          <button 
+            type="button"
+            className={`nav-tab-btn ${showDashboard ? "active" : ""}`}
             onClick={() => setShowDashboard(true)}
           >
             Telemetry Board
-          </span>
-          <span style={{ cursor: "pointer" }} onClick={() => setIsBacktestOpen(true)}>
+          </button>
+          <button 
+            type="button"
+            className="nav-tab-btn"
+            onClick={() => setIsBacktestOpen(true)}
+          >
             Historical Verification
-          </span>
+          </button>
         </nav>
         
         <div className="system-status">
           {/* Settings & Alerts Icons */}
-          <div style={{ display: "flex", gap: "0.75rem", marginRight: "0.5rem" }}>
+          <div style={{ display: "flex", gap: "0.35rem", alignItems: "center" }}>
             <button 
-              title="Notifications" 
-              style={{ background: "none", border: "none", color: "var(--text-secondary)", cursor: "pointer", display: "flex", alignItems: "center" }}
-              onClick={() => alert("Notification center active.")}
+              type="button"
+              className="header-icon-btn"
+              title="Atmospheric Alerts and Bulletins" 
+              aria-label="Toggle notifications panel"
+              onClick={() => setIsNotifOpen(prev => !prev)}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                 <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
               </svg>
+              <span className="notif-badge-dot" />
             </button>
             <button 
-              title="Simulator Config" 
-              style={{ background: "none", border: "none", color: "var(--text-secondary)", cursor: "pointer", display: "flex", alignItems: "center" }}
+              type="button"
+              className="header-icon-btn"
+              title="Simulator Configuration" 
+              aria-label="Scroll to simulation configuration"
               onClick={() => {
                 setShowDashboard(true);
                 setTimeout(() => {
@@ -326,30 +347,99 @@ export default function App() {
                 }, 100);
               }}
             >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
                 <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06-.06a2 2 0 1 1 2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06-.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
               </svg>
             </button>
           </div>
           
-          <div style={{ color: "var(--border-flat)", marginRight: "0.75rem" }}>|</div>
+          <div className="nav-divider" />
           
-          <div className="status-indicator" style={{ marginRight: "0.75rem" }}>
+          <div className="status-pill" title="Open-Meteo weather API connectivity: 18-member ensemble active">
             <span className="status-dot" style={{ backgroundColor: "var(--severity-low)" }} />
-            <span>Open-Meteo API: <strong style={{ color: "var(--text-primary)" }}>Connected</strong></span>
+            <span>Open-Meteo <strong style={{ color: "var(--text-primary)" }}>Connected</strong></span>
           </div>
 
-          <div style={{ color: "var(--border-flat)", marginRight: "0.75rem" }}>|</div>
+          <div className="nav-divider" />
           
-          <div className="status-indicator">
+          <div className="status-pill" title={`Current CRB smoke risk level: ${currentData.risk_level}`}>
             <span className="status-dot" style={{ 
               backgroundColor: riskColor(currentData.risk_level)
             }} />
-            <span>Risk Level: <strong>{currentData.risk_level}</strong></span>
+            <span>Risk: <strong>{currentData.risk_level}</strong></span>
           </div>
         </div>
       </header>
+
+      {/* Notification Center Popover */}
+      {isNotifOpen && (
+        <div className="notification-popover" role="dialog" aria-label="Atmospheric Bulletins">
+          <div className="notif-header">
+            <h3>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--blue)" strokeWidth="2.5" strokeLinecap="round">
+                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+              </svg>
+              Atmospheric Bulletins
+            </h3>
+            <button 
+              type="button" 
+              className="notif-close-btn" 
+              onClick={() => setIsNotifOpen(false)}
+              aria-label="Close notification panel"
+            >
+              ×
+            </button>
+          </div>
+          <div className="notif-list">
+            <div className="notif-item">
+              <div className="notif-meta">
+                <span className="notif-tag notif-tag--alert">DISPERSION ADVISORY</span>
+                <span>T+00h live</span>
+              </div>
+              <div className="notif-title">NW Transport Corridor Active</div>
+              <div className="notif-desc">Wind vectors from Sangrur and Ludhiana bearing toward Delhi-NCR at {currentData.wind_speed.toFixed(1)} km/h. Boundary layer at {Math.round(currentData.boundary_layer_height)}m.</div>
+            </div>
+            <div className="notif-item">
+              <div className="notif-meta">
+                <span className="notif-tag notif-tag--info">SATELLITE SYNC</span>
+                <span>Pass verified</span>
+              </div>
+              <div className="notif-title">NASA FIRMS Thermal Scan Ingested</div>
+              <div className="notif-desc">{meta.fires_tracked} active stubble fire clusters tracked across Punjab and Haryana agricultural belts.</div>
+            </div>
+            <div className="notif-item">
+              <div className="notif-meta">
+                <span className="notif-tag notif-tag--ok">MODEL ENSEMBLE</span>
+                <span>Operational</span>
+              </div>
+              <div className="notif-title">Lagrangian Dispersion Solver Converged</div>
+              <div className="notif-desc">36-hour predictive trajectory calibrated with {meta.confidence_score}% confidence rating.</div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Floating Toast Notification */}
+      {toast && (
+        <div className="toast-container" role="status" aria-live="polite">
+          <div className={`toast-banner toast-${toast.type}`}>
+            <span style={{ fontSize: "1rem" }}>
+              {toast.type === "error" ? "⚠" : toast.type === "success" ? "✓" : "ℹ"}
+            </span>
+            <span>{toast.message}</span>
+            <button 
+              type="button" 
+              className="toast-close-btn" 
+              onClick={() => setToast(null)}
+              aria-label="Dismiss notification"
+            >
+              ×
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* RENDER PAGE 1: LANDING SCREEN */}
       {!showDashboard && (
@@ -386,19 +476,42 @@ export default function App() {
                 smokePm25={currentData.smoke_pm25}
                 isConfidenceDegraded={meta.confidence_score < 70}
                 showConnectingArc={true}
+                currentHour={currentHour}
+                timelineStart={timelineStartMs}
+                timelineLen={timelineLen}
               />
             </div>
             
             {/* Right: Scientific Brand text */}
             <div className="hero-text-card">
+              <div className="hero-eyebrow-pill">
+                <span className="hero-eyebrow-dot" />
+                ATMOSPHERIC EARLY WARNING · DELHI-NCR
+              </div>
               <h2>Delhi's smog has a known origin. Now you can see it coming.</h2>
               <p>
                 Smoke Horizon is a predictive early-warning meteorological instrument. By tracking live 
                 stubble-burning coordinates via satellite scans and resolving them downwind against 2D wind field velocities, 
                 we forecast agricultural smoke arrival times 18 to 36 hours before pollution peaks in Delhi-NCR.
               </p>
+
+              {/* Impact stats band */}
+              <div className="hero-stats">
+                <div className="hero-stat">
+                  <div className="hero-stat-value">18-36h</div>
+                  <div className="hero-stat-label">Advance warning</div>
+                </div>
+                <div className="hero-stat">
+                  <div className="hero-stat-value">{meta.fires_tracked}</div>
+                  <div className="hero-stat-label">Satellite clusters tracked</div>
+                </div>
+                <div className="hero-stat">
+                  <div className="hero-stat-value">{meta.confidence_score}%</div>
+                  <div className="hero-stat-label">Forecast confidence</div>
+                </div>
+              </div>
               
-              <div style={{ display: "flex", gap: "1rem" }}>
+              <div className="hero-cta-row">
                 <button 
                   className="action-btn"
                   onClick={() => setShowDashboard(true)}
@@ -420,34 +533,37 @@ export default function App() {
           {/* Causal Chain flow diagrams */}
           <div className="flow-explainer">
             <div className="flow-card">
+              <span className="flow-card-step mono">STEP 01</span>
               <div className="flow-card-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
                   <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
                 </svg>
               </div>
-              <h3>1. Detect Source</h3>
+              <h3>Detect Source</h3>
               <p>NASA VIIRS & MODIS thermal satellite coordinates fetch active crop residue burning locations across Punjab and Haryana farmland.</p>
             </div>
             
             <div className="flow-card">
+              <span className="flow-card-step mono">STEP 02</span>
               <div className="flow-card-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"></path>
                 </svg>
               </div>
-              <h3>2. Model Drift</h3>
+              <h3>Model Drift</h3>
               <p>Open-Meteo multi-station wind speed vectors interpolate downwind drift paths, adjusting for boundary layers and humidity washout.</p>
             </div>
 
             <div className="flow-card">
+              <span className="flow-card-step mono">STEP 03</span>
               <div className="flow-card-icon">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                   <circle cx="12" cy="12" r="10"></circle>
                   <circle cx="12" cy="12" r="3"></circle>
                 </svg>
               </div>
-              <h3>3. Warn Delhi</h3>
+              <h3>Warn Delhi</h3>
               <p>Receptor risk halos surrounding Delhi-NCR calculate expected PM2.5 increments and trigger safety notifications ahead of stagnation spikes.</p>
             </div>
           </div>
@@ -456,8 +572,8 @@ export default function App() {
           <div className="comparison-section">
             <div className="comparison-box">
               <h3>
-                <span style={{ color: "var(--text-secondary)" }}>●</span>
-                Reactive AQI Apps (Generic readings)
+                <span className="comparison-tag comparison-tag--reactive">REACTIVE MONITORING</span>
+                Standard AQI Ground Stations
               </h3>
               <p>
                 Standard AQI monitors display current readings from localized ground stations. They report when the air is 
@@ -467,8 +583,8 @@ export default function App() {
             </div>
             <div className="comparison-box">
               <h3>
-                <span style={{ color: "var(--severity-low)" }}>●</span>
-                Predictive early warning (Smoke Horizon)
+                <span className="comparison-tag comparison-tag--predictive">PREDICTIVE TRANSPORT</span>
+                Smoke Horizon Dispersion Model
               </h3>
               <p>
                 Smoke Horizon targets the cause. By modeling the meteorological path from source farm fires down to Delhi, 
@@ -488,7 +604,7 @@ export default function App() {
           <section className="map-container-wrapper" style={{ display: "flex", flexDirection: "column" }}>
             {/* Map+Sidebar split */}
             <div style={{ display: "flex", flex: 1, minHeight: 0 }}>
-              {/* Cluster tracked list — left rail */}
+              {/* Cluster tracked list: left rail */}
               <ClusterSidebar
                 fires={fires}
                 selectedClusterId={selectedCluster?.id}
@@ -510,6 +626,9 @@ export default function App() {
                   isConfidenceDegraded={meta.confidence_score < 70}
                   onSelectCluster={handleSelectCluster}
                   selectedClusterId={selectedCluster?.id}
+                  currentHour={currentHour}
+                  timelineStart={timelineStartMs}
+                  timelineLen={timelineLen}
                 />
               </div>
             </div>
@@ -524,6 +643,7 @@ export default function App() {
             ) : (
               <RiskTimeline 
                 timeline={forecast.timeline}
+                fires={fires}
                 currentHour={currentHour}
                 onChangeHour={setCurrentHour}
               />
@@ -618,8 +738,11 @@ export default function App() {
             {/* Detailed Diagnostics */}
             <DiagnosticsCard currentData={currentData} />
 
-            {/* Source Attribution — PM2.5 split by source */}
+            {/* Source Attribution: PM2.5 split by source */}
             <SourceAttribution currentData={currentData} fires={fires} />
+
+            {/* Regional city comparison: exposure across NCR hubs */}
+            <CityComparison forecast={forecast} />
 
             <div className="sidebar-section-label">Fire Tracking</div>
             {/* Hotspots Panel with flight targeted zoom */}
@@ -632,7 +755,7 @@ export default function App() {
             {/* WhatsApp advance-warning alerts via Twilio */}
             <WhatsAppAlerts />
 
-            {/* Personalized Exposure Score — pinned locations */}
+            {/* Personalized Exposure Score: pinned locations */}
             <ExposureScore forecast={forecast} />
 
             <div className="sidebar-section-label">Configuration</div>

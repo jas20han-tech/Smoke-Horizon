@@ -1,7 +1,7 @@
 import { useRef, useEffect, useState } from "react";
 
 /**
- * DataSources — "Research & Data Sources" section.
+ * DataSources - "Research & Data Sources" section.
  *
  * Quiet, utility-first treatment: small type scale, mono font,
  * minimal motion (one soft fade-in on mount, nothing more).
@@ -50,7 +50,7 @@ const SOURCES = [
     id: "modis-aod",
     category: "Aerosol Optical Depth",
     name: "MODIS/VIIRS AOD",
-    fullName: "MODIS Aerosol Optical Depth — MOD04/MYD04 · VIIRS AERDB",
+    fullName: "MODIS Aerosol Optical Depth - MOD04/MYD04 · VIIRS AERDB",
     provider: "NASA LAADS DAAC",
     products: ["MOD04_L2 (Terra, 10 km)", "MYD04_L2 (Aqua, 10 km)", "VIIRS AERDB_L2"],
     provides: "Column-integrated aerosol optical depth at 550 nm, providing a vertically integrated proxy for smoke column burden.",
@@ -64,7 +64,7 @@ const SOURCES = [
     id: "cpcb",
     category: "Ground-Truth PM2.5",
     name: "CPCB Station Network",
-    fullName: "Central Pollution Control Board — Continuous Ambient Air Quality Monitoring",
+    fullName: "Central Pollution Control Board - Continuous Ambient Air Quality Monitoring",
     provider: "Ministry of Environment, Forest and Climate Change, India",
     products: ["CAAQMS PM2.5 (µg/m³)", "AQI composite index"],
     provides: "Hourly ground-level PM2.5 readings from continuous ambient air quality monitoring stations across the Delhi-NCR grid.",
@@ -152,7 +152,7 @@ function SourceRow({ src, isVisible, delay }) {
       <div className="ds-source-body">
         <p className="ds-provides">{src.provides}</p>
         <p className="ds-role">
-          <span className="ds-role-label mono">Role in model —</span>
+          <span className="ds-role-label mono">Role in model: </span>
           {src.role}
         </p>
       </div>

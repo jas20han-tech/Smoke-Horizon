@@ -131,9 +131,11 @@ def fetch_active_fires(db=None, api_key: str = None, raise_on_error: bool = Fals
         lon = spot["lon"] + random.uniform(-0.005, 0.005)
         frp = spot["frp"] + random.uniform(-10.0, 10.0)
         
-        # Acquisition time in the last 12 hours
-        hours_ago = random.uniform(0.5, 12.0)
-        acq_time = current_time - datetime.timedelta(hours=hours_ago)
+        # Acquisition time: fires keep igniting into the forecast window
+        # (stubble-burning ramp-up). Spread from 14h before now to 30h ahead
+        # so the temporal fire-replay shows clusters lighting hour by hour.
+        hours_offset = random.uniform(-14.0, 30.0)
+        acq_time = current_time + datetime.timedelta(hours=hours_offset)
         
         simulated_fires.append({
             "latitude": float(round(lat, 4)),

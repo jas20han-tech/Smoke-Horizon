@@ -5,7 +5,7 @@
  *
  * Estimates the split between:
  *   (A) Crop-residue (stubble) burning contribution
- *   (B) Other urban sources — traffic, industry, dust, construction
+ *   (B) Other urban sources - traffic, industry, dust, construction
  *
  * METHOD: Fire-hotspot-weighted back-trajectory approximation.
  *
@@ -24,9 +24,9 @@
  *   Severe event (high fire count + favorable wind) → up to 80%
  *
  * Confidence scoring:
- *   High    — wind clearly aligned, multiple recent hotspots, burning season
- *   Medium  — partial alignment or few hotspots
- *   Low     — no nearby fires, off-season, or adverse wind
+ *   High - wind clearly aligned, multiple recent hotspots, burning season
+ *   Medium - partial alignment or few hotspots
+ *   Low - no nearby fires, off-season, or adverse wind
  *
  * NOTE: This is a research-grade approximation, not a certified
  * regulatory source apportionment result.
@@ -35,9 +35,6 @@
 // ── Geographic constants ──────────────────────────────────────
 const DELHI_LAT = 28.614;
 const DELHI_LON = 77.209;
-
-// Source region centroids for back-trajectory check
-const FIRE_REGION_CENTROID = { lat: 30.5, lon: 75.5 }; // Punjab/Haryana centroid
 
 // Burning season definition (month numbers, 1-indexed)
 const BURNING_SEASON_MONTHS = new Set([10, 11]); // October, November
@@ -125,7 +122,7 @@ function seasonalWeight(date = new Date()) {
 // When total PM2.5 is very high (>200), more weight to transport events.
 // Scale: 1.0 at 60 µg/m³ → 1.4 at 200+ µg/m³
 function pollutionSensitivity(totalPm25) {
-  return Math.min(1.4, 1.0 + Math.max(0, totalPm25 - 60) / 350);
+  return Math.min(1.4, 1.0 + Math.max(0, totalPm25-60) / 350);
 }
 
 // ── Cap computation ───────────────────────────────────────────
@@ -142,16 +139,16 @@ function getMaxCap(isBurningSeason, fireCount, windAlignment) {
  * calculateSourceAttribution
  *
  * @param {object} params
- *   @param {number}   params.totalPm25       - Current / forecasted total PM2.5 (µg/m³)
- *   @param {number}   params.smokePm25       - Transport model smoke contribution (µg/m³)
- *   @param {number}   params.baselinePm25    - Urban baseline PM2.5 (µg/m³)
- *   @param {number}   params.windDirection   - Met wind direction (degrees, FROM)
- *   @param {number}   params.windSpeed       - Wind speed (km/h)
- *   @param {Array}    params.fires           - Array of fire hotspot objects
+ *   @param {number}   params.totalPm25 - Current / forecasted total PM2.5 (µg/m³)
+ *   @param {number}   params.smokePm25 - Transport model smoke contribution (µg/m³)
+ *   @param {number}   params.baselinePm25 - Urban baseline PM2.5 (µg/m³)
+ *   @param {number}   params.windDirection - Met wind direction (degrees, FROM)
+ *   @param {number}   params.windSpeed - Wind speed (km/h)
+ *   @param {Array}    params.fires - Array of fire hotspot objects
  *                                             Each: { latitude, longitude, frp, acq_time }
- *   @param {number}   params.recepLat        - Receptor latitude (default Delhi)
- *   @param {number}   params.recepLon        - Receptor longitude (default Delhi)
- *   @param {Date}     params.forecastDate    - Date of the forecast step
+ *   @param {number}   params.recepLat - Receptor latitude (default Delhi)
+ *   @param {number}   params.recepLon - Receptor longitude (default Delhi)
+ *   @param {Date}     params.forecastDate - Date of the forecast step
  *
  * @returns {object} Attribution result
  */
@@ -236,9 +233,9 @@ export function calculateSourceAttribution({
   // ── Influence factors text ────────────────────────────────
   const factors = [];
   if (isBurningSeason)
-    factors.push("Active crop-residue burning season (Oct–Nov)");
+    factors.push("Active crop-residue burning season (Oct-Nov)");
   else
-    factors.push("Outside peak burning season — fire contribution capped at 20%");
+    factors.push("Outside peak burning season: fire contribution capped at 20%");
   if (fires.length > 0)
     factors.push(`${fires.length} active fire cluster${fires.length > 1 ? "s" : ""} detected`);
   else
@@ -274,7 +271,7 @@ export function calculateSourceAttribution({
 }
 
 /**
- * getMockFires — fallback mock fire dataset for development/demo.
+ * getMockFires - fallback mock fire dataset for development/demo.
  * Returns a realistic Nov stubble-burning footprint across Punjab/Haryana.
  */
 export function getMockFires() {

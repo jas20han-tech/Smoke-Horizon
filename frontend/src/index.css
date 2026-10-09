@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════
-   Smoke Horizon — Design System
+   Smoke Horizon: Design System
    Dark atmospheric/meteorological palette.
    ═══════════════════════════════════════════════════════════════ */
 *, *::before, *::after {
@@ -22,9 +22,9 @@
   /* ── Typography ── */
   --text-1:       #EAE8E2;   /* primary text */
   --text-2:       #8FA3B1;   /* secondary / caption */
-  --text-3:       #576470;   /* muted / disabled */
+  --text-3:       #7E93A2;   /* muted / secondary captions (WCAG AA compliant) */
 
-  /* ── Accent — atmospheric blue (wind, forecast, data) ── */
+  /* ── Accent: atmospheric blue (wind, forecast, data) ── */
   --blue:         #4A8FBF;
   --blue-dim:     rgba(74, 143, 191, 0.14);
   --blue-border:  rgba(74, 143, 191, 0.30);
@@ -117,7 +117,7 @@ h1, h2, h3, h4 {
   line-height: 1.2;
 }
 
-/* Monospace — telemetry readouts, coordinates, timestamps */
+/* Monospace: telemetry readouts, coordinates, timestamps */
 .mono,
 .stat-value,
 .time-badge,
@@ -880,7 +880,7 @@ h1, h2, h3, h4 {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  /* On 2-col layout, connector is meaningless — hide it */
+  /* On 2-col layout, connector is meaningless - hide it */
   .hiw-connector-wrap {
     display: none;
   }
@@ -1051,7 +1051,7 @@ h1, h2, h3, h4 {
 /* ============================================================
    DATA SOURCES / RESEARCH SECTION  (ds-*)
    Quiet, utility-first. Small type, mono where it counts.
-   One soft fade-in — no scroll choreography.
+   One soft fade-in - no scroll choreography.
    ============================================================ */
 
 .ds-section {
@@ -1121,7 +1121,7 @@ h1, h2, h3, h4 {
   border-top: 1px solid var(--token-border);
 }
 
-/* Hover lift — subtle, keeps the quiet tone */
+/* Hover lift: subtle, keeps the quiet tone */
 .ds-source-row:hover {
   background: color-mix(in srgb, var(--text-primary) 2%, transparent);
 }
@@ -1307,7 +1307,7 @@ h1, h2, h3, h4 {
   .ds-papers-grid { grid-template-columns: 1fr; }
 }
 
-/* Fade-in — same class pattern as sources */
+/* Fade-in: same class pattern as sources */
 .ds-paper-card--out {
   opacity: 0;
   transform: translateY(6px);
@@ -1637,7 +1637,7 @@ h1, h2, h3, h4 {
 
 
 /* ============================================================
-   DOT-MATRIX MAP  — react-simple-maps stipple visual
+   DOT-MATRIX MAP: react-simple-maps stipple visual
    ============================================================ */
 
 /* Override any RSM default outlines */
@@ -1954,7 +1954,7 @@ h1, h2, h3, h4 {
 }
 
 /* ============================================================
-   UI/UX POLISH — v2  (appended, no existing rules changed)
+   UI/UX POLISH: v2  (appended, no existing rules changed)
    ============================================================ */
 
 /* ── Loading screen ── */
@@ -2274,3 +2274,480 @@ h1, h2, h3, h4 {
   color: var(--text-3);
   font-size: 0.62rem;
 }
+
+/* ============================================================
+   UI/UX POLISH: v3  (appended, no existing rules changed)
+   ============================================================ */
+
+/* ── Global scrollbars ── */
+* { scrollbar-width: thin; scrollbar-color: var(--border-light) transparent; }
+*::-webkit-scrollbar { width: 8px; height: 8px; }
+*::-webkit-scrollbar-track { background: transparent; }
+*::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 4px; }
+*::-webkit-scrollbar-thumb:hover { background: var(--text-3); }
+
+/* ── Focus visibility (a11y) ── */
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+/* ── Text selection ── */
+::selection { background: rgba(74,143,191,0.35); color: var(--text-1); }
+
+/* ── Form controls: dark scheme + Firefox range parity ── */
+input, select, textarea { color-scheme: dark; }
+input[type="range"]::-moz-range-thumb {
+  width: 13px; height: 13px; border-radius: 50%;
+  background: var(--blue); border: 2px solid var(--bg-panel);
+  box-shadow: 0 0 0 1px var(--blue-border); cursor: pointer;
+}
+input[type="range"]::-moz-range-track {
+  height: 3px; background: var(--border-light); border-radius: 2px;
+}
+
+/* ── Modal (Backtest / Historical Verification) ── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 1000;
+  background: rgba(5,8,12,0.72);
+  backdrop-filter: blur(4px);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem;
+  animation: modalFade 0.18s ease;
+}
+.modal-content {
+  position: relative;
+  width: min(880px, 100%);
+  max-height: 86vh;
+  overflow-y: auto;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--r-lg);
+  box-shadow: 0 24px 70px rgba(0,0,0,0.6), 0 0 0 1px rgba(74,143,191,0.08);
+  animation: modalRise 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.modal-content::-webkit-scrollbar { width: 6px; }
+.modal-content::-webkit-scrollbar-thumb { background: var(--border-light); border-radius: 3px; }
+@keyframes modalFade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes modalRise {
+  from { opacity: 0; transform: translateY(14px) scale(0.985); }
+  to   { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .modal-overlay, .modal-content { animation: none; }
+}
+
+/* ── Stat boxes hover lift ── */
+.stat-box { transition: border-color 0.2s, transform 0.2s; }
+.stat-box:hover { border-color: var(--border-light); transform: translateY(-1px); }
+
+/* ── Top-bar nav hover ── */
+.top-bar nav span {
+  transition: color 0.15s, border-color 0.15s, opacity 0.15s;
+  opacity: 0.85;
+}
+.top-bar nav span:hover { opacity: 1; color: var(--text-1); }
+
+/* ── Telemetry strip ambient glow ── */
+.telemetry-strip { position: relative; overflow: hidden; }
+.telemetry-strip::after {
+  content: "";
+  position: absolute; inset: 0;
+  pointer-events: none;
+  background: radial-gradient(60% 120% at 50% 0%, rgba(74,143,191,0.06), transparent 70%);
+}
+
+/* ── Card hover shadow (subtle, keeps layout stable) ── */
+.glass-card { transition: border-color 0.2s, box-shadow 0.2s; }
+.glass-card:hover { box-shadow: 0 4px 18px rgba(0,0,0,0.22); }
+
+/* ── Landing hero CTA row ── */
+.hero-cta-row { display: flex; gap: 0.85rem; flex-wrap: wrap; }
+.hero-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.6rem;
+  margin-bottom: 1.4rem;
+}
+.hero-stat {
+  padding: 0.65rem 0.8rem;
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+}
+.hero-stat-value {
+  font-size: 1.05rem; font-weight: 700;
+  color: var(--text-1);
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: -0.02em;
+}
+.hero-stat-label {
+  font-size: 0.6rem; color: var(--text-3);
+  text-transform: uppercase; letter-spacing: 0.08em;
+  font-family: 'JetBrains Mono', monospace;
+  margin-top: 2px;
+}
+@media (max-width: 720px) {
+  .hero-stats { grid-template-columns: 1fr; }
+  .hero-section { grid-template-columns: 1fr; }
+}
+
+/* ── Flow cards step number chip ── */
+.flow-card-step {
+  position: absolute; top: 0.65rem; right: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem; font-weight: 700; letter-spacing: 0.08em;
+  color: var(--text-3);
+}
+.flow-card { position: relative; }
+.flow-card h3 { display: flex; align-items: center; gap: 0.45rem; }
+
+/* ── Timeline meta grid polish ── */
+.timeline-meta-grid { padding-top: 2px; }
+.timeline-meta-cell {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  padding: 0.45rem 0.6rem;
+}
+.timeline-meta-label { margin-bottom: 2px; }
+
+/* ── Header status pill ── */
+.status-pill {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.22rem 0.6rem;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--bg-base);
+}
+.status-pill .status-dot { width: 6px; height: 6px; }
+
+/* ── Navigation Segmented Control ── */
+.nav-segment-group {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  padding: 3px;
+  border-radius: var(--r-md);
+}
+
+.nav-tab-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-2);
+  padding: 4px 11px;
+  border-radius: var(--r-sm);
+  font-family: 'Inter', -apple-system, sans-serif;
+  font-size: 0.76rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  user-select: none;
+}
+
+.nav-tab-btn:hover {
+  color: var(--text-1);
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.nav-tab-btn.active {
+  background: var(--bg-raised);
+  border-color: var(--border-light);
+  color: var(--text-1);
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.nav-tab-btn:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.nav-divider {
+  width: 1px;
+  height: 18px;
+  background: var(--border);
+  margin: 0 4px;
+}
+
+.header-icon-btn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--text-2);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: var(--r-sm);
+  transition: all 0.15s ease;
+  position: relative;
+}
+
+.header-icon-btn:hover {
+  color: var(--text-1);
+  background: var(--bg-raised);
+  border-color: var(--border);
+}
+
+.header-icon-btn:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 1px;
+}
+
+.notif-badge-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--fire);
+  box-shadow: 0 0 6px var(--fire);
+}
+
+/* ── Notification Center Popover ── */
+.notification-popover {
+  position: absolute;
+  top: 52px;
+  right: 12px;
+  width: 360px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--r-md);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.04);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  animation: popoverFadeIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes popoverFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.notif-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.notif-header h3 {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-1);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.notif-close-btn {
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.notif-close-btn:hover {
+  color: var(--text-1);
+  background: var(--bg-hover);
+}
+
+.notif-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 380px;
+  overflow-y: auto;
+}
+
+.notif-item {
+  padding: 0.7rem 0.9rem;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  transition: background 0.15s ease;
+}
+
+.notif-item:last-child {
+  border-bottom: none;
+}
+
+.notif-item:hover {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.notif-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.65rem;
+  color: var(--text-3);
+}
+
+.notif-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 600;
+  padding: 1px 5px;
+  border-radius: 2px;
+}
+
+.notif-tag--alert {
+  background: var(--fire-dim);
+  color: var(--fire);
+  border: 1px solid var(--fire-border);
+}
+
+.notif-tag--info {
+  background: var(--blue-dim);
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
+}
+
+.notif-tag--ok {
+  background: var(--green-dim);
+  color: var(--green);
+  border: 1px solid rgba(45, 184, 122, 0.28);
+}
+
+.notif-title {
+  font-size: 0.76rem;
+  font-weight: 600;
+  color: var(--text-1);
+}
+
+.notif-desc {
+  font-size: 0.72rem;
+  color: var(--text-2);
+  line-height: 1.4;
+}
+
+/* ── Toast Notifications ── */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+
+.toast-banner {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.65rem 1rem;
+  background: var(--bg-panel);
+  border: 1px solid var(--border-light);
+  border-radius: var(--r-md);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+  min-width: 280px;
+  max-width: 420px;
+  font-size: 0.78rem;
+  color: var(--text-1);
+  animation: toastSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes toastSlideUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.toast-banner.toast-error {
+  border-color: rgba(224, 72, 72, 0.45);
+  background: #140d0f;
+}
+
+.toast-banner.toast-success {
+  border-color: rgba(45, 184, 122, 0.45);
+  background: #0d1612;
+}
+
+.toast-banner.toast-info {
+  border-color: var(--blue-border);
+  background: var(--bg-panel);
+}
+
+.toast-close-btn {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: var(--text-3);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 2px;
+}
+
+.toast-close-btn:hover {
+  color: var(--text-1);
+}
+
+/* ── Comparison Tags ── */
+.comparison-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  padding: 2px 7px;
+  border-radius: 2px;
+  display: inline-block;
+  margin-right: 6px;
+  vertical-align: middle;
+}
+
+.comparison-tag--reactive {
+  background: rgba(143, 163, 177, 0.12);
+  color: var(--text-2);
+  border: 1px solid var(--border-light);
+}
+
+.comparison-tag--predictive {
+  background: var(--blue-dim);
+  color: var(--blue);
+  border: 1px solid var(--blue-border);
+}
+
+/* ── Hero Eyebrow Pill ── */
+.hero-eyebrow-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.68rem;
+  font-weight: 600;
+  color: var(--blue);
+  background: var(--blue-dim);
+  border: 1px solid var(--blue-border);
+  padding: 3px 10px;
+  border-radius: 20px;
+  margin-bottom: 1rem;
+  letter-spacing: 0.05em;
+  width: fit-content;
+}
+
+.hero-eyebrow-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+}
+

@@ -1,13 +1,13 @@
 /**
- * Comparison — Reactive AQI apps vs Smoke Horizon predictive model.
+ * Comparison - Reactive AQI apps vs Smoke Horizon predictive model.
  * Lazy-loaded via LazySection wrapper.
  */
 const ROWS = [
-  { label: "Advance warning", reactive: "None — reports current state", predictive: "6–36 hours ahead" },
+  { label: "Advance warning", reactive: "None: reports current ground state", predictive: "6-36 hours ahead" },
   { label: "Data source", reactive: "Ground station PM2.5 sensors", predictive: "Satellite fire + wind physics" },
   { label: "Scope", reactive: "Local sensor grid only", predictive: "Source-to-receptor transport" },
   { label: "Actionable lead time", reactive: "0 hours", predictive: "Half a day to a day+" },
-  { label: "Cause identified", reactive: "No", predictive: "Yes — down to farm cluster" },
+  { label: "Cause identified", reactive: "No", predictive: "Yes: down to individual farm clusters" },
 ];
 
 export default function Comparison() {

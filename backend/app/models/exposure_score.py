@@ -28,11 +28,13 @@ from typing import Any
 
 
 # ── Sensitivity multipliers ────────────────────────────────────
-# Based on WHO/CPCB guidelines for vulnerable populations:
-#   Children (<12): developing lungs, 1.5× risk per µg/m³
-#   Elderly (>60): reduced respiratory reserve, 1.4×
-#   Asthma/COPD: direct trigger threshold much lower, 1.8×
-#   Outdoor worker: 8h continuous exposure vs ~2h typical, 1.6×
+# Informed by WHO/CPCB vulnerability guidance and EPA exposure
+# factor handbook. Exact multipliers are author parameterizations
+# calibrated to produce clinically meaningful score differentiation:
+#   Children (<12): developing lungs, ~1.5× risk per µg/m³
+#   Elderly (>60): reduced respiratory reserve, ~1.4×
+#   Asthma/COPD: direct trigger threshold much lower, ~1.8×
+#   Outdoor worker: 8h continuous exposure vs ~2h typical, ~1.6×
 #   Adult (healthy): baseline 1.0×
 SENSITIVITY = {
     "child":          1.55,
@@ -43,7 +45,9 @@ SENSITIVITY = {
 }
 
 # ── Safe PM2.5 thresholds by profile (µg/m³ / 24h) ───────────
-# Source: WHO 2021 AQG + CPCB India standards
+# Informed by WHO 2021 AQG and CPCB India National Ambient
+# Air Quality Standards. Exact thresholds are author selections
+# from these guidelines, calibrated for population-level risk.
 SAFE_PM25 = {
     "child":          15.0,   # WHO AQG annual
     "elderly":        20.0,

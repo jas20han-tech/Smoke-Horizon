@@ -1,5 +1,5 @@
 /**
- * geoLocate.js — reverse geocode a lat/lon to Indian state name
+ * geoLocate.js - reverse geocode a lat/lon to Indian state name
  * using the same india-fast.json GeoJSON we already bundle.
  *
  * Uses point-in-polygon. Result is cached indefinitely (immutable geo data).
@@ -56,24 +56,24 @@ export async function getStateName(lat, lon) {
         return name;
       }
     }
-  } catch (e) {
+  } catch {
     // GeoJSON not available yet
   }
 
-  // Outside all features — give a rough region name
+  // Outside all features - give a rough region name
   const fallback = getFallbackName(lat, lon);
   _cache.set(key, fallback);
   return fallback;
 }
 
 /**
- * Synchronous best-effort version — returns cached value or fallback.
+ * Synchronous best-effort version - returns cached value or fallback.
  * Use this in render; call getStateName() once to prime the cache.
  */
 export function getStateNameSync(lat, lon) {
   const key = `${lat.toFixed(2)},${lon.toFixed(2)}`;
   if (_cache.has(key)) return _cache.get(key);
-  // Not cached yet — return fallback and let async version fill cache
+  // Not cached yet - return fallback and let async version fill cache
   return getFallbackName(lat, lon);
 }
 
@@ -109,7 +109,7 @@ function getFallbackName(lat, lon) {
   return `${lat.toFixed(1)}°N, ${lon.toFixed(1)}°E`;
 }
 
-// Legacy compatibility — synchronous nearest-city lookup replaced by state lookup
+// Legacy compatibility - synchronous nearest-city lookup replaced by state lookup
 export function getClosestCity(lat, lon) {
   return getStateNameSync(lat, lon);
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from "recharts";
 import { fetchBacktest } from "../api/client";
 
@@ -30,12 +30,12 @@ export default function BacktestModal({ isOpen, onClose }) {
     <div className="modal-overlay" onClick={onClose}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ padding: "1.75rem" }}>
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1.5rem" }}>
-          <h2 style={{ fontFamily: "Outfit", fontSize: "1.4rem", margin: 0, color: "var(--transition-blue)" }}>
+          <h2 style={{ fontFamily: "Space Grotesk, sans-serif", fontSize: "1.3rem", fontWeight: 700, margin: 0, color: "var(--transition-blue)" }}>
             Model Validation & Backtest
           </h2>
           <button 
             className="action-btn secondary" 
-            style={{ width: "auto", padding: "0.4rem 0.8rem", borderRadius: "8px" }}
+            style={{ width: "auto", padding: "0.4rem 0.8rem", borderRadius: "var(--r-sm)" }}
             onClick={onClose}
           >
             ✕ Close
@@ -48,25 +48,34 @@ export default function BacktestModal({ isOpen, onClose }) {
         {!loading && !error && data && (
           <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem" }}>
             <p style={{ fontSize: "0.85rem", color: "var(--text-secondary)", lineHeight: "1.45" }}>
-              The line chart below compares forecasted PM2.5 levels (including crop burning smoke dispersion)
-              against actual data reported by Delhi Central Pollution Control Board (CPCB) monitoring stations
-              during the historical stubble burning window of <strong>{metrics.evaluation_period}</strong>.
+              The line chart compares forecasted PM2.5 levels against actual CPCB ITO station readings
+              during <strong>{metrics.evaluation_period}</strong>. Fire inputs use simulated coordinates
+              calibrated to real NW India stubble hotspots (NASA FIRMS). The transport model uses
+              real Open-Meteo reanalysis weather for each day.
             </p>
 
             {/* Metrics cards grid */}
             <div className="stat-group">
               <div className="stat-box" style={{ background: "var(--transition-blue-soft)" }}>
-                <span className="stat-label">Pearson Correlation (R²)</span>
+                <span className="stat-label">R² (Total PM2.5)</span>
                 <span className="stat-value" style={{ color: "var(--transition-blue)" }}>{metrics.r_squared}</span>
               </div>
               <div className="stat-box" style={{ background: "var(--severity-low-soft)" }}>
-                <span className="stat-label">Mean Absolute Error (MAE)</span>
+                <span className="stat-label">MAE (Total PM2.5)</span>
                 <span className="stat-value" style={{ color: "var(--severity-low)" }}>{metrics.mean_absolute_error} µg/m³</span>
+              </div>
+              <div className="stat-box" style={{ background: "rgba(255,183,77,0.08)" }}>
+                <span className="stat-label">Smoke Bias</span>
+                <span className="stat-value" style={{ color: "#ffb74d" }}>{metrics.bias ?? "--"} µg/m³</span>
+              </div>
+              <div className="stat-box" style={{ background: "rgba(129,199,132,0.08)" }}>
+                <span className="stat-label">Smoke MAE</span>
+                <span className="stat-value" style={{ color: "#81c784" }}>{metrics.smoke_mae ?? "--"} µg/m³</span>
               </div>
             </div>
 
             {/* Recharts Comparison Container */}
-            <div style={{ width: "100%", height: 300, background: "var(--bg-panel)", border: "1px solid var(--border-flat)", borderRadius: "12px", padding: "0.5rem" }}>
+            <div style={{ width: "100%", height: 300, background: "var(--bg-panel)", border: "1px solid var(--border-flat)", borderRadius: "var(--r-md)", padding: "0.5rem" }}>
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={data} margin={{ top: 15, right: 15, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="var(--border-flat)" />
@@ -76,7 +85,7 @@ export default function BacktestModal({ isOpen, onClose }) {
                     contentStyle={{ 
                       backgroundColor: "var(--bg-panel)", 
                       border: "1px solid var(--border-flat)",
-                      borderRadius: "8px",
+                      borderRadius: "var(--r-sm)",
                       color: "var(--text-primary)",
                       fontSize: "12px"
                     }} 

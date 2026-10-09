@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function AlertCard({ riskLevel, pm25 }) {
   const getAlertContent = (level) => {
     switch (level) {

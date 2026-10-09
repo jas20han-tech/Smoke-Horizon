@@ -1,4 +1,4 @@
-import React, { useMemo, useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { getStateNameSync, primeCache } from "../utils/geoLocate";
 
 // ── Palette ───────────────────────────────────────────────────
@@ -79,17 +79,18 @@ function StageBadge({ label, active, color }) {
 
 // ── Main component ────────────────────────────────────────────
 export default function ClusterDetailCard({ fire, windSpeed, onClose }) {
-  if (!fire) return null;
   const [, forceUpdate] = useState(0);
   useEffect(() => {
-    primeCache([fire]).then(() => forceUpdate(n => n + 1));
+    if (fire) primeCache([fire]).then(() => forceUpdate(n => n + 1));
   }, [fire]);
 
-  const stateName = getStateNameSync(fire.latitude, fire.longitude);
+  const stateName = fire ? getStateNameSync(fire.latitude, fire.longitude) : "";
   const { progress, distToDelhi, hoursToDelhi, pm25Contribution } = useMemo(
-    () => transitProgress(fire, windSpeed),
+    () => fire ? transitProgress(fire, windSpeed) : { progress: 0, distToDelhi: 0, hoursToDelhi: 0, pm25Contribution: 0 },
     [fire, windSpeed]
   );
+
+  if (!fire) return null;
 
   const riskLevel =
     pm25Contribution > 60 ? "High" : pm25Contribution > 25 ? "Moderate" : "Low";

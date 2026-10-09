@@ -8,7 +8,7 @@
  * Uses calculateSourceAttribution() from sourceAttribution.js.
  * Falls back to mock fire data when no live fires are available.
  */
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import {
   calculateSourceAttribution,
   getMockFires,
@@ -16,10 +16,10 @@ import {
 
 // ── Palette tokens ────────────────────────────────────────────
 const T = {
-  fire:    "#E8743B",  // stubble — warm fire orange
+  fire:    "#E8743B",  // stubble: warm fire orange
   fireHi:  "#E04848",  // severe stubble
   fireLo:  "#D4913A",  // light stubble
-  other:   "#4A8FBF",  // other sources — atmospheric blue
+  other:   "#4A8FBF",  // other sources: atmospheric blue
   otherDim:"#263F52",  // other dim
   bg:      "#0F1419",
   border:  "#1E2933",
@@ -33,7 +33,7 @@ const T = {
 
 const CONFIDENCE_COLOR = { High: T.green, Medium: T.amber, Low: T.red };
 
-// ── Donut chart — pure SVG, no library ───────────────────────
+// ── Donut chart - pure SVG, no library ───────────────────────
 function DonutChart({ stubblePct, otherPct }) {
   const R = 36, CX = 50, CY = 50;
   const circ = 2 * Math.PI * R;
@@ -42,7 +42,6 @@ function DonutChart({ stubblePct, otherPct }) {
   const stubbleDash = (stubblePct / 100) * circ;
   // other arc starts after stubble
   const otherDash   = (otherPct  / 100) * circ;
-  const otherOffset = circ - stubbleDash;
 
   // color based on severity
   const stubbleColor =
@@ -209,7 +208,7 @@ export default function SourceAttribution({ currentData, fires }) {
         <ConfidencePill level={confidence} />
       </div>
 
-      {/* Visual — donut + legend side by side */}
+      {/* Visual: donut and legend side by side */}
       <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
         <DonutChart stubblePct={stubblePct} otherPct={otherPct} />
 
@@ -238,7 +237,7 @@ export default function SourceAttribution({ currentData, fires }) {
         {[
           { label: "Total PM2.5",    value: `${totalPm25} µg/m³` },
           { label: "Wind",           value: `${windLabel} · ${windSpeed.toFixed(0)} km/h` },
-          { label: "Active clusters",value: fireCount > 0 ? `${fireCount}` : "—" },
+          { label: "Active clusters",value: fireCount > 0 ? `${fireCount}` : "--" },
           { label: "Season",         value: isBurningSeason ? "Burning ✓" : "Off-season" },
         ].map(({ label, value }) => (
           <div key={label} style={{
@@ -259,7 +258,7 @@ export default function SourceAttribution({ currentData, fires }) {
         ))}
       </div>
 
-      {/* Influence factors — collapsible */}
+      {/* Influence factors: collapsible */}
       <div>
         <button
           onClick={() => setShowFactors(f => !f)}

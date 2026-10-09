@@ -1,0 +1,154 @@
+{
+  "metrics": {
+    "mae": 64.8,
+    "rmse": 109.2,
+    "r_squared": -0.337,
+    "correlation": -0.011,
+    "bias": -17.8,
+    "n_points": 353,
+    "total_backtest_days": 15,
+    "evaluation_period": "Oct 15, 2025 - Oct 29, 2025",
+    "smoke_mae": 64.5,
+    "smoke_r_squared": -0.509,
+    "smoke_correlation": -0.056,
+    "smoke_bias": -18.1,
+    "model_status": "Baseline-dominated \u2014 transport signal needs amplification"
+  },
+  "data": [
+    {
+      "date": "Oct 15",
+      "baseline": 89.6,
+      "predicted": 110.4,
+      "actual": 97.2,
+      "error": 27.3,
+      "smoke_predicted": 20.8,
+      "smoke_actual": 7.6
+    },
+    {
+      "date": "Oct 16",
+      "baseline": 89.6,
+      "predicted": 126.5,
+      "actual": 100.0,
+      "error": 28.5,
+      "smoke_predicted": 36.9,
+      "smoke_actual": 10.3
+    },
+    {
+      "date": "Oct 17",
+      "baseline": 89.6,
+      "predicted": 153.2,
+      "actual": 108.8,
+      "error": 48.2,
+      "smoke_predicted": 63.6,
+      "smoke_actual": 19.1
+    },
+    {
+      "date": "Oct 18",
+      "baseline": 89.6,
+      "predicted": 183.8,
+      "actual": 126.8,
+      "error": 65.6,
+      "smoke_predicted": 94.2,
+      "smoke_actual": 37.2
+    },
+    {
+      "date": "Oct 19",
+      "baseline": 89.6,
+      "predicted": 166.1,
+      "actual": 152.9,
+      "error": 53.8,
+      "smoke_predicted": 76.4,
+      "smoke_actual": 63.2
+    },
+    {
+      "date": "Oct 20",
+      "baseline": 89.6,
+      "predicted": 127.2,
+      "actual": 184.5,
+      "error": 75.8,
+      "smoke_predicted": 37.6,
+      "smoke_actual": 94.9
+    },
+    {
+      "date": "Oct 21",
+      "baseline": 85.2,
+      "predicted": 120.3,
+      "actual": 334.1,
+      "error": 253.8,
+      "smoke_predicted": 35.1,
+      "smoke_actual": 251.5
+    },
+    {
+      "date": "Oct 22",
+      "baseline": 89.6,
+      "predicted": 196.1,
+      "actual": 235.9,
+      "error": 124.3,
+      "smoke_predicted": 106.5,
+      "smoke_actual": 146.3
+    },
+    {
+      "date": "Oct 23",
+      "baseline": 89.6,
+      "predicted": 173.1,
+      "actual": 154.5,
+      "error": 50.2,
+      "smoke_predicted": 83.5,
+      "smoke_actual": 64.9
+    },
+    {
+      "date": "Oct 24",
+      "baseline": 89.6,
+      "predicted": 154.1,
+      "actual": 126.9,
+      "error": 50.5,
+      "smoke_predicted": 64.5,
+      "smoke_actual": 37.7
+    },
+    {
+      "date": "Oct 25",
+      "baseline": 89.6,
+      "predicted": 120.2,
+      "actual": 133.2,
+      "error": 25.0,
+      "smoke_predicted": 30.6,
+      "smoke_actual": 43.7
+    },
+    {
+      "date": "Oct 26",
+      "baseline": 89.6,
+      "predicted": 106.9,
+      "actual": 143.3,
+      "error": 48.5,
+      "smoke_predicted": 17.3,
+      "smoke_actual": 54.1
+    },
+    {
+      "date": "Oct 27",
+      "baseline": 89.6,
+      "predicted": 98.2,
+      "actual": 155.5,
+      "error": 57.4,
+      "smoke_predicted": 8.5,
+      "smoke_actual": 65.9
+    },
+    {
+      "date": "Oct 28",
+      "baseline": 89.6,
+      "predicted": 91.8,
+      "actual": 151.6,
+      "error": 59.8,
+      "smoke_predicted": 2.2,
+      "smoke_actual": 62.0
+    },
+    {
+      "date": "Oct 29",
+      "baseline": 90.9,
+      "predicted": 107.3,
+      "actual": 146.6,
+      "error": 50.1,
+      "smoke_predicted": 16.4,
+      "smoke_actual": 57.9
+    }
+  ]
+}

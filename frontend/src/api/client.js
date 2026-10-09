@@ -92,6 +92,17 @@ export async function scoreAllPins(timeline, fires, forecastWindowHours = 24) {
   return d;
 }
 
+export async function scoreCities(timeline, fires, forecastWindowHours = 24) {
+  const r = await fetch(`${API_BASE}/exposure/cities`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ timeline, fires, forecast_window_hours: forecastWindowHours }),
+  });
+  const d = await r.json();
+  if (!r.ok) throw new Error(d.detail || "Failed to score regional cities.");
+  return d;
+}
+
 export async function createAlertSubscription(payload) {
   const response = await fetch(`${API_BASE}/alerts/subscribe`, {
     method: "POST",

@@ -1,14 +1,14 @@
 import { useRef, useEffect, useState } from "react";
 
 /**
- * HowItWorks — 4-step sequential pipeline with scroll-triggered reveals.
+ * HowItWorks - 4-step sequential pipeline with scroll-triggered reveals.
  *
  * Each step fades + slides in when it enters the viewport, staggered.
  * An SVG connector line draws itself in as the section scrolls into view,
  * linking the four pipeline nodes left-to-right.
  *
  * Lazy-loaded via LazySection wrapper (no eager import needed here).
- * Respects prefers-reduced-motion — skips all animation if set.
+ * Respects prefers-reduced-motion - skips all animation if set.
  */
 
 const PIPELINE = [
@@ -16,8 +16,8 @@ const PIPELINE = [
     num: "01",
     tag: "SATELLITE DETECTION",
     title: "Fire detection via NASA FIRMS",
-    body: "NASA FIRMS ingests VIIRS (375 m) and MODIS (1 km) thermal anomaly data every 3–12 hours. Each hotspot returns a lat/lon centroid, acquisition time, and Fire Radiative Power (FRP) in megawatts — a direct proxy for combustion intensity. The system filters for crop-residue burn signatures across Punjab and Haryana based on seasonal patterns and spatial clusters.",
-    source: "NASA FIRMS · VIIRS/MODIS · 375 m–1 km resolution",
+    body: "NASA FIRMS ingests VIIRS (375 m) and MODIS (1 km) thermal anomaly data every 3-12 hours. Each hotspot returns a lat/lon centroid, acquisition time, and Fire Radiative Power (FRP) in megawatts - a direct proxy for combustion intensity. The system filters for crop-residue burn signatures across Punjab and Haryana based on seasonal patterns and spatial clusters.",
+    source: "NASA FIRMS · VIIRS/MODIS · 375 m-1 km resolution",
     accent: "amber",
     icon: (
       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -30,7 +30,7 @@ const PIPELINE = [
     num: "02",
     tag: "ATMOSPHERIC MODELING",
     title: "Wind field and dispersion parameters",
-    body: "Open-Meteo provides hourly wind speed, wind direction, boundary layer height (BLH), relative humidity, and precipitation probability across a 15 km grid covering the transport corridor. BLH governs vertical mixing — a shallow layer traps smoke close to the surface and increases ground-level PM2.5. Humidity and precipitation act as washout coefficients that reduce modeled concentrations.",
+    body: "Open-Meteo provides hourly wind speed, wind direction, boundary layer height (BLH), relative humidity, and precipitation probability across a 15 km grid covering the transport corridor. BLH governs vertical mixing - a shallow layer traps smoke close to the surface and increases ground-level PM2.5. Humidity and precipitation act as washout coefficients that reduce modeled concentrations.",
     source: "Open-Meteo ERA5 · Hourly · 15 km grid · 18-member ensemble",
     accent: "blue",
     icon: (
@@ -43,7 +43,7 @@ const PIPELINE = [
     num: "03",
     tag: "TRANSPORT SIMULATION",
     title: "Plume trajectory to Delhi-NCR",
-    body: "A Lagrangian particle transport model advances each fire-sourced particle along the wind field at each timestep. FRP-weighted emission mass, BLH-based dilution, and humidity decay are applied at each step. The resulting ensemble of particle positions over 0–36 hours produces a time-resolved smoke concentration field — expressed as an incremental PM2.5 contribution over the CPCB baseline at the Delhi receptor.",
+    body: "A Lagrangian particle transport model advances each fire-sourced particle along the wind field at each timestep. FRP-weighted emission mass, BLH-based dilution, and humidity decay are applied at each step. The resulting ensemble of particle positions over 0-36 hours produces a time-resolved smoke concentration field - expressed as an incremental PM2.5 contribution over the CPCB baseline at the Delhi receptor.",
     source: "Custom Lagrangian model · 36-hr horizon · Hourly particle positions",
     accent: "blue",
     icon: (
@@ -77,7 +77,7 @@ function PipelineStep({ step, index, isVisible }) {
       className={`hiw-step hiw-step--${isVisible ? "visible" : "hidden"}`}
       style={{ transitionDelay: `${index * 120}ms` }}
     >
-      {/* Node — appears on the connector line */}
+      {/* Node - appears on the connector line */}
       <div className={`hiw-node hiw-node--${step.accent}`} aria-hidden="true">
         <span className="hiw-node-icon">{step.icon}</span>
       </div>
@@ -164,7 +164,7 @@ export default function HowItWorks() {
     typeof window !== "undefined" &&
     window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
-  /* Connector scroll-progress observer — watches the whole section */
+  /* Connector scroll-progress observer - watches the whole section */
   useEffect(() => {
     if (prefersReduced) {
       setConnectorProgress(1);
@@ -220,7 +220,7 @@ export default function HowItWorks() {
       <div className="hiw-header">
         <span className="section-label mono">METHODOLOGY</span>
         <h2 className="hiw-heading">
-          From satellite detection to forecast — four steps
+          From satellite detection to forecast: four steps
         </h2>
         <p className="hiw-intro">
           Each stage is a distinct scientific operation. The output of each feeds
@@ -228,7 +228,7 @@ export default function HowItWorks() {
         </p>
       </div>
 
-      {/* Connector SVG — sits above the step grid, below the nodes */}
+      {/* Connector SVG - sits above the step grid, below the nodes */}
       <div className="hiw-connector-wrap" aria-hidden="true">
         <PipelineConnector progress={connectorProgress} />
       </div>
@@ -252,7 +252,7 @@ export default function HowItWorks() {
       {/* Footer note */}
       <p className="hiw-footnote mono">
         All data pipelines run server-side. Frontend receives pre-computed
-        particle positions and PM2.5 increments — no raw satellite data is
+        particle positions and PM2.5 increments; no raw satellite data is
         transferred to the client.
       </p>
     </div>

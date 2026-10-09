@@ -5,10 +5,10 @@
  * Alerts fire on FORECASTED values, not current live readings.
  *
  * Visual language: deep slate, ember amber for alert states,
- * atmospheric blue for forecast/info states — consistent with
+ * atmospheric blue for forecast/info states - consistent with
  * Smoke Horizon's environmental forecasting aesthetic.
  */
-import React, { useState } from "react";
+import { useState } from "react";
 import { createAlertSubscription, deleteAlertSubscription, testAlertSend } from "../api/client";
 
 // ── Palette (mirrors index.css tokens) ───────────────────────
@@ -17,7 +17,7 @@ const T = {
   blue:    "#4A8FE0",
   green:   "#1D9E75",
   red:     "#E85D3D",
-  muted:   "#6B7280",
+  muted:   "#8FA3B1",
   border:  "#1C2430",
   surface: "#111519",
   text:    "#E8E6E0",
@@ -110,7 +110,7 @@ function ActiveSubscriptionCard({ sub, onDelete, onTest }) {
       setTestStatus({ type: "success", message: "Test message sent! Check your WhatsApp." });
     } catch (e) {
       const msg = e.message.includes("Twilio credentials not configured")
-        ? "Twilio credentials missing — add TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN to your .env file and restart the backend."
+        ? "Twilio credentials missing: add TWILIO_ACCOUNT_SID and TWILIO_AUTH_TOKEN to your .env file and restart the backend."
         : e.message.includes("not a valid")
         ? "Make sure you have sent 'join <keyword>' from your WhatsApp to the Twilio sandbox number first."
         : e.message;
@@ -300,7 +300,7 @@ export default function WhatsAppAlerts() {
       {/* Description */}
       <p style={{ fontSize: "0.74rem", color: T.muted, lineHeight: 1.55, marginTop: -4 }}>
         Receive advance SMS warnings when the <em>forecast</em> shows AQI or PM2.5
-        will cross your threshold — hours before the smoke arrives.
+        will cross your threshold, hours before the smoke arrives.
       </p>
 
       {/* Status banner */}
@@ -365,7 +365,7 @@ export default function WhatsAppAlerts() {
             </Field>
           </div>
 
-          {/* Info note — forecasted not live */}
+          {/* Info note: forecasted not live */}
           <div style={{
             fontSize: "0.7rem", color: T.blue, lineHeight: 1.45,
             padding: "7px 10px", borderRadius: 3,
@@ -379,7 +379,7 @@ export default function WhatsAppAlerts() {
               <line x1="12" y1="16" x2="12.01" y2="16"/>
             </svg>
             Alert triggers when the <strong style={{ color: T.blue }}>&nbsp;forecast&nbsp;</strong>
-            crosses your threshold — giving you advance warning, not a real-time reading.
+            crosses your threshold: providing advance warning rather than a delayed ground reading.
           </div>
 
           <button type="submit" disabled={submitting} style={{

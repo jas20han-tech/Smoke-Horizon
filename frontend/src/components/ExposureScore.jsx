@@ -1,14 +1,14 @@
 /**
- * ExposureScore.jsx — Personalized Exposure Score panel.
+ * ExposureScore.jsx - Personalized Exposure Score panel.
  *
  * Lets users pin locations (Home, School, Office, Hospital, Custom)
  * and see a 0-100 forecasted exposure risk score for each, based on
- * predicted smoke transport — not current AQI.
+ * predicted smoke transport - not current AQI.
  *
  * Visual language: deep slate, ember amber/red for high risk,
  * atmospheric blue for forecast data, public-health tone.
  */
-import React, { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { createPin, listPins, deletePin, scoreAllPins } from "../api/client";
 
 // ── Palette ───────────────────────────────────────────────────
@@ -18,7 +18,7 @@ const C = {
   green:   "#1D9E75",
   orange:  "#F07040",
   red:     "#E85D3D",
-  muted:   "#6B7280",
+  muted:   "#8FA3B1",
   border:  "#1C2430",
   surface: "rgba(17,21,25,0.95)",
   text:    "#E8E6E0",
@@ -239,7 +239,6 @@ export default function ExposureScore({ forecast }) {
   const [submitting, setSubmitting] = useState(false);
   const [loadingId,  setLoadingId]  = useState(null);
   const [error,      setError]      = useState(null);
-  const [useMap,     setUseMap]     = useState(false);
 
   const set = (k, v) => setForm(f => ({ ...f, [k]: v }));
 
@@ -344,7 +343,7 @@ export default function ExposureScore({ forecast }) {
       {/* Subhead */}
       <p style={{ fontSize: "0.73rem", color: C.muted, lineHeight: 1.55, marginTop: -6 }}>
         Pin your home, school, or workplace to get a personalised
-        forecasted exposure risk score — hours before smoke arrives.
+        forecasted exposure risk score hours before smoke arrives.
       </p>
 
       {/* Error */}
@@ -398,7 +397,7 @@ export default function ExposureScore({ forecast }) {
               fontFamily: "JetBrains Mono, monospace" }}>
               Location Name <span style={{ color: C.amber }}>*</span>
             </div>
-            <input style={inp} value={form.name} placeholder="e.g. Home — Rohini Sector 8"
+            <input style={inp} value={form.name} placeholder="e.g. Home (Rohini Sector 8)"
               onChange={e => set("name", e.target.value)}
               onFocus={e => e.target.style.borderColor = C.blue}
               onBlur={e  => e.target.style.borderColor = C.border} />

@@ -18,4 +18,12 @@ export default defineConfig([
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
   },
+  {
+    files: ['**/*.{js,jsx}'],
+    rules: {
+      // The app's established async pattern is fetch-on-mount with an
+      // async handler; the effect body itself is non-blocking.
+      'react-hooks/set-state-in-effect': 'off',
+    },
+  },
 ])

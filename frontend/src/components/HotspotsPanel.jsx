@@ -1,4 +1,5 @@
-import React, { useEffect } from "react";
+/* eslint-disable react-refresh/only-export-components */
+import { useEffect } from "react";
 import { getStateNameSync, primeCache } from "../utils/geoLocate";
 
 // Re-export for backward compat with ClusterSidebar / ClusterDetailCard
@@ -52,7 +53,7 @@ export default function HotspotsPanel({ fires, onFlyTo }) {
                   alignItems: "center",
                   background: "var(--panel-subtle)",
                   border: "1px solid var(--border-flat)",
-                  borderRadius: "8px",
+                  borderRadius: "var(--r-sm)",
                   padding: "0.5rem 0.75rem",
                   fontSize: "0.8rem"
                 }}
@@ -84,7 +85,7 @@ export default function HotspotsPanel({ fires, onFlyTo }) {
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    borderRadius: "6px",
+                    borderRadius: "var(--r-sm)",
                     border: "1px solid color-mix(in srgb, var(--text-primary) 15%, transparent)"
                   }}
                 >

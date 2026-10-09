@@ -1,5 +1,3 @@
-import React from "react";
-
 export default function ConfidenceBanner({ meta }) {
   if (!meta) return null;
 

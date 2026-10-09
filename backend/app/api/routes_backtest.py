@@ -1,75 +1,48 @@
 from fastapi import APIRouter
-import datetime
-import random
+import json
+import os
 
 router = APIRouter(prefix="/api/backtest", tags=["backtest"])
+
+BACKTEST_RESULTS_PATH = os.path.join(
+    os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+    "backtest_results.json",
+)
+
 
 @router.get("/")
 def get_backtest_results():
     """
-    Get historical backtest data points for validation.
-    Compares predicted PM2.5 vs actual PM2.5 recorded by CPCB ground sensors
-    for a 14-day historical stubble-burning peak window (Oct 15 - Oct 29).
+    Historical backtest: transport model predictions vs CPCB ITO ground truth.
+    15-day evaluation window (Oct 15-29, 2025) using real Open-Meteo weather
+    and simulated FIRMS fire coordinates calibrated to NW India stubble region.
     """
-    # Generate 14 days of comparison data
-    backtest_data = []
-    start_date = datetime.date(2025, 10, 15)
-    
-    # We want a deterministic set of data points so the chart is stable and realistic
-    # Let's seed with a static value
-    random.seed(42)
-    
-    total_ae = 0.0
-    
-    for i in range(14):
-        date_str = (start_date + datetime.timedelta(days=i)).strftime("%b %d")
-        
-        # Stubble burning begins rising, peaks, then drops
-        # Let's build a bell curve of smoke impact
-        day_factor = math_bell_curve(i, peak_day=8, width=4)
-        smoke_impact_pred = 80.0 * day_factor + random.uniform(5.0, 20.0)
-        
-        # Actual has some additional random weather noise
-        smoke_impact_actual = smoke_impact_pred + random.uniform(-18.0, 18.0)
-        smoke_impact_actual = max(10.0, smoke_impact_actual)
-        
-        baseline_pm25 = 110.0 + random.uniform(-10.0, 10.0)
-        
-        predicted_pm25 = baseline_pm25 + smoke_impact_pred
-        actual_pm25 = baseline_pm25 + smoke_impact_actual
-        
-        ae = abs(predicted_pm25 - actual_pm25)
-        total_ae += ae
-        
-        backtest_data.append({
-            "date": date_str,
-            "baseline": float(round(baseline_pm25, 1)),
-            "predicted": float(round(predicted_pm25, 1)),
-            "actual": float(round(actual_pm25, 1)),
-            "error": float(round(ae, 1))
-        })
-        
-    random.seed() # reset seed
-    
-    mae = float(round(total_ae / 14, 1))
-    
-    # Pearson R^2 approximation for typical model
-    r2_score = 0.88
-    
+    if os.path.exists(BACKTEST_RESULTS_PATH):
+        with open(BACKTEST_RESULTS_PATH, "r") as f:
+            results = json.load(f)
+        metrics = results.get("metrics", {})
+        return {
+            "metrics": {
+                "mean_absolute_error": metrics.get("mae", 0),
+                "r_squared": metrics.get("r_squared", 0),
+                "correlation": metrics.get("correlation", 0),
+                "bias": metrics.get("bias", 0),
+                "smoke_mae": metrics.get("smoke_mae", 0),
+                "smoke_r_squared": metrics.get("smoke_r_squared", 0),
+                "total_backtest_days": metrics.get("total_backtest_days", 0),
+                "evaluation_period": metrics.get("evaluation_period", ""),
+                "model_status": metrics.get("model_status", ""),
+            },
+            "data": results.get("data", []),
+        }
+
     return {
         "metrics": {
-            "mean_absolute_error": mae,
-            "r_squared": r2_score,
-            "total_backtest_days": 14,
-            "evaluation_period": "Oct 15, 2025 - Oct 29, 2025",
-            "model_status": "Highly Calibrated"
+            "mean_absolute_error": 0,
+            "r_squared": 0,
+            "total_backtest_days": 0,
+            "evaluation_period": "N/A",
+            "model_status": "No backtest results available. Run: python -m app.backtest_engine",
         },
-        "data": backtest_data
+        "data": [],
     }
-
-def math_bell_curve(x: float, peak_day: float, width: float) -> float:
-    return math_exponential_decay(x, peak_day, width)
-
-def math_exponential_decay(x: float, peak: float, width: float) -> float:
-    import math
-    return math.exp(-((x - peak) ** 2) / (2 * (width ** 2)))

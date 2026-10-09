@@ -285,3 +285,56 @@ def score_single_pin(
         user_sensitivity=pin.user_sensitivity,
         **score_data,
     )
+
+
+# ── Regional city comparison ──────────────────────────────────
+
+REGIONAL_CITIES = [
+    {"city": "Delhi-NCR",  "latitude": 28.6139, "longitude": 77.2090},
+    {"city": "Ludhiana",   "latitude": 30.9010, "longitude": 75.8573},
+    {"city": "Chandigarh", "latitude": 30.7333, "longitude": 76.7794},
+    {"city": "Amritsar",   "latitude": 31.6340, "longitude": 74.8723},
+    {"city": "Patiala",    "latitude": 30.3398, "longitude": 76.3869},
+    {"city": "Hisar",      "latitude": 29.1492, "longitude": 75.7217},
+]
+
+
+class CityScoreOut(BaseModel):
+    city:               str
+    latitude:           float
+    longitude:          float
+    exposure_score:     int
+    risk_level:         str
+    forecast_window_hours: int
+    forecasted_aqi:     int
+    forecasted_pm25:    float
+    main_risk_reason:   str
+    recommended_action: str
+    sensitivity_multiplier: float
+    safe_pm25_limit:    float
+
+
+@router.post("/cities", response_model=list[CityScoreOut])
+def score_regional_cities(payload: ScoreRequest):
+    """
+    Forecast personalized exposure for a fixed list of regional cities.
+    Read-only — never touches the database or user pins.
+    Reuses the same scoring engine as pinned locations.
+    """
+    results = []
+    for city in REGIONAL_CITIES:
+        score_data = calculate_exposure_score(
+            lat=city["latitude"],
+            lon=city["longitude"],
+            user_sensitivity="adult",
+            timeline=payload.timeline,
+            fires=payload.fires,
+            forecast_window_hours=payload.forecast_window_hours,
+        )
+        results.append(CityScoreOut(
+            city=city["city"],
+            latitude=city["latitude"],
+            longitude=city["longitude"],
+            **score_data,
+        ))
+    return results

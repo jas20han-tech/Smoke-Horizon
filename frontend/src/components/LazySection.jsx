@@ -1,7 +1,7 @@
-import React, { useRef, useState, useEffect, Suspense } from "react";
+import { useRef, useState, useEffect, Suspense } from "react";
 
 /**
- * LazySection — IntersectionObserver-based lazy loader.
+ * LazySection - IntersectionObserver-based lazy loader.
  * Dynamically imports and mounts child sections when they are
  * ~200px from entering the viewport. Shows a skeleton placeholder
  * until the real content mounts.
@@ -15,7 +15,7 @@ export default function LazySection({ loader, id, skeletonHeight = "320px" }) {
   const [triggered, setTriggered] = useState(false);
 
   useEffect(() => {
-    // Respect prefers-reduced-motion — still load the component, just skip
+    // Respect prefers-reduced-motion - still load the component, just skip
     // the IntersectionObserver delay and load immediately.
     const prefersReduced =
       window.matchMedia("(prefers-reduced-motion: reduce)").matches;

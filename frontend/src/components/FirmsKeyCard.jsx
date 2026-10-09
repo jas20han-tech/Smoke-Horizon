@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { updateFirmsKey } from "../api/client";
 
 export default function FirmsKeyCard({ onKeySuccess, currentStatus }) {
@@ -17,7 +17,7 @@ export default function FirmsKeyCard({ onKeySuccess, currentStatus }) {
       setError("");
       setMessage("");
       try {
-        const res = await updateFirmsKey("");
+        await updateFirmsKey("");
         setMessage("Reverted to simulated satellite feed.");
         setKey(""); // Clear input
         onKeySuccess(); // Trigger forecast reload in App
@@ -117,12 +117,16 @@ export default function FirmsKeyCard({ onKeySuccess, currentStatus }) {
           color: "var(--text-secondary)", 
           display: "flex", 
           justifyContent: "space-between", 
+          alignItems: "center",
           borderTop: "1px solid var(--border-flat)", 
           paddingTop: "0.6rem", 
           marginTop: "0.25rem" 
         }}>
           <span>Open-Meteo Weather API</span>
-          <span style={{ color: "var(--severity-low)", fontWeight: "600" }}>● Connected (Live 3-Station Sync)</span>
+          <span style={{ color: "var(--severity-low)", fontWeight: "600", display: "inline-flex", alignItems: "center", gap: "5px" }}>
+            <span className="status-dot" style={{ backgroundColor: "var(--severity-low)" }} />
+            Connected (Live 3-Station Sync)
+          </span>
         </div>
       </form>
     </div>

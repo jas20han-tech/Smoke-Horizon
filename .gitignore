@@ -25,3 +25,4 @@ dist-ssr/
 *.swp
 Thumbs.db
 desktop.ini
+.agents/
